@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexo - Zero-Drag Engine Prototype</title>
+    <style>
+        /* 墨水屏友好基础样式：高对比度黑白，坚硬的线条 */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+        }
+        
+        /* 左侧：宏观调度区 */
+        #macro-panel {
+            width: 30%;
+            border-right: 3px solid #000;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #f8f8f8;
+        }
+
+        /* 右侧：微观编辑区 */
+        #micro-panel {
+            width: 70%;
+            padding: 40px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        h2 {
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+        }
+
+        /* 文本段落基础样式 */
+        .lexo-paragraph {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            padding: 10px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        /* 鼠标悬停时的提示：这里可以被交互 */
+        .lexo-paragraph:hover {
+            border: 2px dashed #999;
+        }
+
+        /* 魔法时刻：转化为卡片后的硬朗状态 (墨水屏友好阴影) */
+        .is-card {
+            border: 2px solid #000;
+            padding: 15px;
+            box-shadow: 6px 6px 0px #000; 
+            background-color: #fff;
+        }
+
+        #notification {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="macro-panel">
+        <h2>宏观调度 (Macro)</h2>
+        <p>这里将存放你的卡片库、大纲结构和知识图谱。</p>
+        <div id="notification"></div>
+    </div>
+
+    <div id="micro-panel">
+        <h2>微观编辑 (Micro)</h2>
+        <p><strong>【操作测试】</strong>：请将鼠标移至下方段落，并尝试<strong>双击</strong>它。</p>
+        
+        <p class="lexo-paragraph" id="test-paragraph">
+            作为以前的文科研究生，让随时涌现的片段思绪以及各种碎片资料和概念，最快记录下来并随时编织成大段论述，是生命线。Lexo 的使命就是将这段文字，在不拖拽的情况下，瞬间凝固成一张独立思考的卡片。
+        </p>
+    </div>
+
+    <script>
+        const testPara = document.getElementById('test-paragraph');
+        const notification = document.getElementById('notification');
+
+        // 监听鼠标双击事件 (dblclick)
+        testPara.addEventListener('dblclick', function() {
+            
+            // 切换段落的卡片状态
+            this.classList.toggle('is-card');
+            
+            // 在左侧宏观区给出响应，模拟数据同步
+            if(this.classList.contains('is-card')) {
+                notification.innerHTML = '✨ 右侧段落已瞬间打包为卡片！<br>ID: Lexo-Card-001';
+            } else {
+                notification.innerHTML = '段落已解除卡片化，回归文本流。';
+            }
+        });
+    </script>
+</body>
+</html>
