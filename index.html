@@ -1,14 +1,20 @@
 <!DOCTYPE html><html lang="en" class="notranslate" translate="no"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lexo 3.3.1 - Zen Workspace</title>
+    <title>Lexo 3.1 - Intuit Workspace</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; transition: none !important; -webkit-tap-highlight-color: transparent; }
         body { display: flex; flex-direction: column; height: 100vh; background-color: #ffffff !important; color: #000000 !important; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }
         body.mode-high-contrast { background-color: #000000 !important; color: #ffffff !important; }
 
-        #top-toolbar { display: flex; justify-content: center; gap: 6vw; align-items: center; height: 54px; border-bottom: 3px solid currentColor; padding: 0 10px; background-color: #ffffff; flex-shrink: 0; position: relative; z-index: 1000; }
+        #top-toolbar { position: relative; display: flex; justify-content: center; gap: 6vw; align-items: center; height: 54px; padding: 0 10px; background-color: #ffffff; flex-shrink: 0; z-index: 1000; }
         body.mode-high-contrast #top-toolbar { background-color: #000000; }
+
+        /* ☕ DONATION BUTTON STYLES */
+        #btn-sponsor { position: absolute; right: 16px; text-decoration: none; color: #000000; background-color: #ff9900; font-weight: bold; font-size: 12pt; padding: 6px 12px; border: 2px solid #000000; display: flex; align-items: center; justify-content: center; transform: rotate(5deg); cursor: pointer; }
+        body.mode-high-contrast #btn-sponsor { border-color: #ffffff; }
+        #btn-sponsor:hover { background-color: #e0e0e0; }
+        body.mode-high-contrast #btn-sponsor:hover { background-color: #333333; }
 
         .toolbar-group { display: flex; gap: 2px; align-items: center; position: relative; }
         .icon-btn { width: 42px; height: 42px; font-size: 20px; font-weight: bold; background: transparent; color: inherit; border: 2px solid transparent; cursor: pointer; display: flex; justify-content: center; align-items: center; }
@@ -27,7 +33,6 @@
         .dropdown-item:hover { background-color: #e0e0e0; }
         body.mode-high-contrast .dropdown-item:hover { background-color: #333333; }
 
-        /* Slider Controls */
         .visual-row-slider { margin-bottom: 24px; }
         .visual-row-slider label { display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
         .visual-row-slider label span:last-child { color: #ff9900; }
@@ -81,23 +86,62 @@
         .lexo-tab { flex: 1; text-align: center; padding: 8px 0; cursor: pointer; font-weight: bold; font-size: 13px; text-transform: uppercase; border-bottom: 3px solid transparent; opacity: 0.4; }
         .lexo-tab.tab-active { opacity: 1; border-bottom: 3px solid currentColor; }
 
-        /* 📺 FULLSCREEN ZEN MODE STYLES */
-        body.fullscreen-mode #top-toolbar { height: 0; border-bottom: none; overflow: visible; background-color: transparent !important; pointer-events: none; }
+        /* 📺 FULLSCREEN INTUIT MODE STYLES */
+        body.fullscreen-mode #top-toolbar { height: 0; overflow: visible; background-color: transparent !important; pointer-events: none; }
         body.fullscreen-mode .toolbar-group:not(.undo-redo-group) { display: none !important; }
+        body.fullscreen-mode #btn-sponsor { display: none !important; }
         
         body.fullscreen-mode .undo-redo-group { position: fixed; top: 16px; right: 24px; pointer-events: auto; background-color: #ffffff; border: 3px solid #000000; padding: 2px 6px; z-index: 5000; }
         body.mode-high-contrast.fullscreen-mode .undo-redo-group { background-color: #000000; border-color: #ffffff; }
         body.fullscreen-mode .undo-redo-group .separator { display: none; }
         
         body.fullscreen-mode #milestone-console { display: none !important; }
-        
-        /* Expand text width, leave 60px right padding to preserve the Margin Anchor trigger area */
-        body.fullscreen-mode #micro-panel { padding-top: 80px !important; padding-right: 60px !important; } 
+        body.fullscreen-mode #micro-panel { padding-top: 80px !important; padding-right: 60px !important; }
+
+        /* 🎨 ARTISTIC TOP-LEFT LOGO TEXT */
+        #lexo-logo {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            pointer-events: none;
+            z-index: 1100;
+        }
+        .logo-text {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 9pt;
+            line-height: 1.1;
+            transform: rotate(-15deg);
+            display: inline-block;
+        }
     </style></head><body class="mode-high-contrast">
+
+    <script>
+        const ACCESS_KEY = "lexo2026";
+        const isAuthorized = localStorage.getItem('lexo_auth');
+        
+        if (isAuthorized !== 'true') {
+            const userInput = prompt("🔒 Lexo 3.1 (Beta)\n\nPlease enter the developer invitation key to access this workspace:");
+            if (userInput === ACCESS_KEY) {
+                localStorage.setItem('lexo_auth', 'true');
+                alert("✅ Key accepted. Welcome to the Intuit Workspace.");
+            } else {
+                document.body.innerHTML = "<div style='display:flex; height:100vh; flex-direction:column; justify-content:center; align-items:center; font-family:sans-serif; background:#000; color:#fff;'><h2>🔒 Access Restricted</h2><p style='margin-top:10px; opacity:0.7;'>Invalid invitation key.</p></div>";
+                throw new Error("Unauthorized Access"); 
+            }
+        }
+    </script>
 
     <input type="file" id="lexo-file-importer" accept=".txt,.html,.htm" style="display:none;" onchange="handleFileImport(event)">
 
     <div id="top-toolbar">
+        <div id="lexo-logo">
+            <span class="logo-text">Lexo</span>
+            <span class="logo-text">Intuit</span>
+        </div>
+
         <div class="toolbar-group">
             <button class="icon-btn" id="btn-top" title="Jump to Top">⏫</button>
             <button class="icon-btn" id="btn-page-up" title="Page Up">🔼</button>
@@ -200,6 +244,10 @@
             <button class="icon-btn" id="btn-page-down" title="Page Down">🔽</button>
             <button class="icon-btn" id="btn-bottom" title="Jump to Bottom">⏬</button>
         </div>
+
+        <button id="btn-sponsor" title="Support the Developer" onclick="alert('接受捐助账号\n\nPaypal: ionlan@outlook.com')">
+            Thanks for Donate
+        </button>
     </div>
 
     <div id="main-workspace">
@@ -291,8 +339,8 @@
         const fontSizes = [12, 16, 20, 24, 26];
         let currentFontSizeIndex = 2; 
         
-        // --- 核心时钟变量：用于判定双击/三击延迟 ---
         let basecampTimer = null;
+        let clickCount = 0;
         
         function handleSliderFontSize(val) {
             currentFontSizeIndex = parseInt(val);
@@ -481,12 +529,6 @@
             const stored = localStorage.getItem('lexo_file_system');
             if (stored) { 
                 fileSystem = JSON.parse(stored); 
-                let migrated = false;
-                fileSystem.forEach(f => {
-                    if (f.title === '默认华章') { f.title = 'Default File'; migrated = true; }
-                    if (f.title.includes('Chapter')) { f.title = f.title.replace('Chapter', 'File'); migrated = true; }
-                });
-                if (migrated) saveFileSystemData();
             }
             if (fileSystem.length === 0) { createNewFile("Default File", true); } 
             else { fileSystem.sort((a, b) => b.lastModified - a.lastModified); loadFile(fileSystem[0].id); }
@@ -501,7 +543,7 @@
 
             const newFile = {
                 id: 'lexo_file_' + Date.now().toString(), title: fileName,
-                content: `<div class="para-wrapper"><p class="lexo-paragraph">Start drafting your manuscript here...</p></div>`,
+                content: `<div class="para-wrapper"><p class="lexo-paragraph">Start drafting your Lexo 3.1 manuscript here...</p></div>`,
                 lastModified: new Date().getTime(), snapshots: []
             };
 
@@ -570,138 +612,6 @@
             });
         }
 
-        document.getElementById('btn-stop').addEventListener('click', () => {
-            if (!currentFileId) return;
-            const fileIndex = fileSystem.findIndex(f => f.id === currentFileId);
-            if (fileIndex === -1) return;
-            if (!fileSystem[fileIndex].snapshots) { fileSystem[fileIndex].snapshots = []; }
-            let snapshots = fileSystem[fileIndex].snapshots;
-            
-            const currentContent = panel.innerHTML;
-            const textStr = panel.innerText || "";
-            const cjkCount = (textStr.match(/[\u3400-\u9fa5]/g) || []).length;
-            const latinCount = (textStr.replace(/[\u3400-\u9fa5]/g, ' ').match(/[a-zA-Z0-9_]+/g) || []).length;
-            const totalWords = cjkCount + latinCount;
-
-            if (snapshots.length > 0 && snapshots[snapshots.length - 1].content === currentContent) {
-                showToast(`🔒 Words: ${totalWords} (No changes)`);
-                return;
-            }
-            
-            const newSnapshot = { 
-                id: Date.now(), 
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}), 
-                date: new Date().toLocaleDateString(), 
-                content: currentContent 
-            };
-            
-            if (snapshots.length < 5) { 
-                snapshots.push(newSnapshot); 
-            } else { 
-                let oldestTwo = snapshots.slice(0, 2); 
-                let recent = snapshots.slice(2); 
-                recent.push(newSnapshot); 
-                if (recent.length > 3) { recent.shift(); }
-                fileSystem[fileIndex].snapshots = oldestTwo.concat(recent); 
-            }
-
-            saveFileSystemData(); 
-            renderVersionList();
-            showToast(`🔒 Saved | Words: ${totalWords}`);
-        });
-
-        function renderVersionList() {
-            const container = document.getElementById('version-list-container'); container.innerHTML = '';
-            const file = fileSystem.find(f => f.id === currentFileId);
-            if (!file || !file.snapshots || file.snapshots.length === 0) {
-                container.innerHTML = '<div style="font-size:12px; opacity:0.6; padding:4px;">No historical snapshots. Click ⏹️ to save.</div>'; return;
-            }
-
-            const clearBtn = document.createElement('div');
-            clearBtn.innerHTML = `<div class="dropdown-item" style="text-align:center; color:#ff4444; border-color:#ff4444; margin-bottom:8px; font-weight:bold;">🗑️ Clear History</div>`;
-            clearBtn.onclick = (e) => {
-                e.stopPropagation();
-                if (confirm("Are you sure you want to clear all version history for this file?")) {
-                    file.snapshots = [];
-                    saveFileSystemData();
-                    renderVersionList();
-                    showToast("🗑️ History Cleared");
-                }
-            };
-            container.appendChild(clearBtn);
-
-            file.snapshots.forEach((v, index) => {
-                const item = document.createElement('div'); item.className = 'dropdown-item'; 
-                let tag = index < 2 ? "[Base]" : "[Recent]";
-                item.innerHTML = `<strong>${tag} Mark ${index + 1}</strong><br><span style="font-size:11px;opacity:0.6;">${v.date} ${v.time}</span>`;
-                item.onclick = (e) => { 
-                    e.stopPropagation();
-                    if (confirm(`Revert workspace to Mark ${index + 1}?`)) { 
-                        panel.innerHTML = v.content; 
-                        saveCurrentContent(); 
-                        forceUnlockAll(); 
-                        renderGravelList(); 
-                        renderKeywordsList(); 
-                        renderAnchorsList();
-                        saveHistory(); 
-                        showToast(`↩️ Reverted to Mark ${index + 1}`); 
-                        closeAllDropdowns();
-                    } 
-                };
-                container.appendChild(item);
-            });
-        }
-
-        document.getElementById('btn-undo').addEventListener('click', () => {
-            if (historyIndex > 0) { 
-                historyIndex--; panel.innerHTML = historyStack[historyIndex]; forceUnlockAll(); saveCurrentContent(); 
-                renderGravelList(); renderKeywordsList(); renderAnchorsList(); showToast("↩️ Undo Successful");
-            } else { showToast("⚠️ Earliest record reached"); }
-        });
-        document.getElementById('btn-redo').addEventListener('click', () => {
-            if (historyIndex < historyStack.length - 1) { 
-                historyIndex++; panel.innerHTML = historyStack[historyIndex]; forceUnlockAll(); saveCurrentContent(); 
-                renderGravelList(); renderKeywordsList(); renderAnchorsList(); showToast("↪️ Redo Successful");
-            } else { showToast("⚠️ Latest record reached"); }
-        });
-
-        panel.addEventListener('input', () => { 
-            saveCurrentContent(); 
-            renderGravelList();    
-            renderKeywordsList();  
-            renderAnchorsList();
-            showToast("⚡ Auto-saved"); 
-            clearTimeout(typingTimer); 
-            typingTimer = setTimeout(saveHistory, 1000); 
-        });
-
-        window.addEventListener('DOMContentLoaded', () => { 
-            initFileSystem(); 
-            forceUnlockAll(); 
-            saveHistory(); 
-            renderGravelList(); 
-            renderKeywordsList(); 
-            renderAnchorsList();
-        });
-
-        document.addEventListener('selectionchange', () => {
-            if (modeState !== "NONE") return; 
-            const sel = window.getSelection();
-            if (sel.rangeCount > 0) { const range = sel.getRangeAt(0); if (panel.contains(range.commonAncestorContainer)) { lastCursorPosition = range.cloneRange(); } }
-        });
-
-        function resetModes() { modeState = "NONE"; paraStage = 0; phraseStage = 0; selectedParaWrapper = null; phraseStartRange = null; phraseCard = null; clearShiftMarker(); forceUnlockAll(); window.getSelection().removeAllRanges(); }
-
-        btnPara.addEventListener('click', () => {
-            if (modeState === "PARA") { resetModes(); showToast("❌ Shift Canceled"); } 
-            else { resetModes(); modeState = "PARA"; btnPara.classList.add('btn-active'); panel.setAttribute('contenteditable', 'false'); showToast("▤ Paragraph Shift: Double-click to lock [Source]"); }
-        });
-
-        btnPhrase.addEventListener('click', () => {
-            if (modeState === "PHRASE") { resetModes(); showToast("❌ Shift Canceled"); } 
-            else { resetModes(); modeState = "PHRASE"; btnPhrase.classList.add('btn-active'); panel.setAttribute('contenteditable', 'false'); showToast("↔ Phrase Shift: Double-click [Start Point]"); }
-        });
-
         function getPreciseBlockNode(clientX, clientY) {
             let exactNode = document.elementFromPoint(clientX, clientY);
             if (!exactNode) return null;
@@ -746,11 +656,9 @@
             if (!panel.contains(range.commonAncestorContainer)) return;
 
             let blockNode = getPreciseBlockNode(e.clientX, e.clientY);
-            
             if (!blockNode || blockNode === panel) { showToast("⚠️ Cursor not in a valid block"); return; }
             
             const existingTail = blockNode.querySelector('.gravel-tail.active-gravel');
-            
             if (existingTail) {
                 existingTail.remove();
                 renderGravelList(); saveCurrentContent(); saveHistory();
@@ -770,26 +678,25 @@
             showToast(`⁖ Paragraph Tagged`);
         });
 
-        // --- 核心修复：独立拦截三击事件触发全屏 (Triple Click Listener) ---
         panel.addEventListener('click', function(e) {
-            if (e.detail === 3) {
+            clickCount++;
+            if (e.detail === 3 || clickCount === 3) {
                 e.preventDefault(); 
                 if (basecampTimer) {
                     clearTimeout(basecampTimer);
                     basecampTimer = null;
                 }
+                clickCount = 0;
                 document.body.classList.toggle('fullscreen-mode');
-                const isOn = document.body.classList.contains('fullscreen-mode');
-                showToast(isOn ? "📺 Zen Mode: ON" : "📺 Zen Mode: OFF");
+                showToast(document.body.classList.contains('fullscreen-mode') ? "Refreshed | Intuit Mode: ON" : "Refreshed | Intuit Mode: OFF");
                 resetModes(); 
-                window.getSelection().removeAllRanges(); // 强行清除系统自带的三击全选文字高亮
+                window.getSelection().removeAllRanges();
+                return;
             }
+            setTimeout(() => { clickCount = 0; }, 450);
         });
-        // -----------------------------------------------------------------
 
         panel.addEventListener('dblclick', function(e) {
-            // 三击拦截交由上方 click 事件处理，此处直接移除了原先的 e.detail >= 3 逻辑
-
             const tail = e.target.nodeType === 3 ? e.target.parentNode.closest('.gravel-tail') : e.target.closest('.gravel-tail');
             if (tail) {
                 e.preventDefault(); e.stopPropagation();
@@ -801,7 +708,6 @@
 
             if (modeState === "NONE") {
                 if (!basecampCursor) { 
-                    // 完美延时：等待 400 毫秒看是否有第三次点击，如果没有，则触发双击回旋镖原点记录
                     if (basecampTimer) clearTimeout(basecampTimer);
                     basecampTimer = setTimeout(() => { 
                         const sel = window.getSelection(); 
@@ -927,6 +833,88 @@
             }
         });
 
+        document.getElementById('btn-stop').addEventListener('click', () => {
+            if (!currentFileId) return;
+            const fileIndex = fileSystem.findIndex(f => f.id === currentFileId);
+            if (fileIndex === -1) return;
+            if (!fileSystem[fileIndex].snapshots) { fileSystem[fileIndex].snapshots = []; }
+            let snapshots = fileSystem[fileIndex].snapshots;
+            
+            const currentContent = panel.innerHTML;
+            const textStr = panel.innerText || "";
+            const cjkCount = (textStr.match(/[\u3400-\u9fa5]/g) || []).length;
+            const latinCount = (textStr.replace(/[\u3400-\u9fa5]/g, ' ').match(/[a-zA-Z0-9_]+/g) || []).length;
+            const totalWords = cjkCount + latinCount;
+
+            if (snapshots.length > 0 && snapshots[snapshots.length - 1].content === currentContent) {
+                showToast(`🔒 Words: ${totalWords} (No changes to save)`);
+                return;
+            }
+            
+            const newSnapshot = { 
+                id: Date.now(), 
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}), 
+                date: new Date().toLocaleDateString(), 
+                content: currentContent 
+            };
+            
+            if (snapshots.length < 5) { 
+                snapshots.push(newSnapshot); 
+            } else { 
+                let oldestTwo = snapshots.slice(0, 2); 
+                let recentThree = snapshots.slice(2); 
+                recentThree.push(newSnapshot); 
+                if (recentThree.length > 3) { recentThree.shift(); }
+                fileSystem[fileIndex].snapshots = oldestTwo.concat(recentThree); 
+            }
+
+            saveFileSystemData(); 
+            renderVersionList();
+            showToast(`🔒 Saved | Words: ${totalWords}`);
+        });
+
+        function renderVersionList() {
+            const container = document.getElementById('version-list-container'); container.innerHTML = '';
+            const file = fileSystem.find(f => f.id === currentFileId);
+            if (!file || !file.snapshots || file.snapshots.length === 0) {
+                container.innerHTML = '<div style="font-size:12px; opacity:0.6; padding:4px;">No snapshots. Click ⏹️ to save.</div>'; return;
+            }
+
+            const clearBtn = document.createElement('div');
+            clearBtn.innerHTML = `<div class="dropdown-item" style="text-align:center; color:#ff4444; border-color:#ff4444; margin-bottom:8px; font-weight:bold;">🗑️ Clear History</div>`;
+            clearBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm("Clear all version logs for this document?")) {
+                    file.snapshots = [];
+                    saveFileSystemData();
+                    renderVersionList();
+                    showToast("🗑️ History Cleared");
+                }
+            };
+            container.appendChild(clearBtn);
+
+            file.snapshots.forEach((v, index) => {
+                const item = document.createElement('div'); item.className = 'dropdown-item'; 
+                let tag = index < 2 ? "[Base]" : "[Recent]";
+                item.innerHTML = `<strong>${tag} Mark ${index + 1}</strong><br><span style="font-size:11px;opacity:0.6;">${v.date} ${v.time}</span>`;
+                item.onclick = (e) => { 
+                    e.stopPropagation();
+                    if (confirm(`Revert workspace to Mark ${index + 1}?`)) { 
+                        panel.innerHTML = v.content; 
+                        saveCurrentContent(); 
+                        forceUnlockAll(); 
+                        renderGravelList(); 
+                        renderKeywordsList(); 
+                        renderAnchorsList();
+                        saveHistory(); 
+                        showToast(`↩️ Reverted to Mark ${index + 1}`); 
+                        closeAllDropdowns();
+                    } 
+                };
+                container.appendChild(item);
+            });
+        }
+
         function getGravelPreview(tail) {
             let text = "";
             let curr = tail.previousSibling;
@@ -943,10 +931,8 @@
                 }
                 curr = curr.previousSibling;
             }
-            
             text = text.replace(/⁖/g, '').replace(/\n/g, '').trim();
             if (text.length > 0) return text.substring(0, 15);
-            
             let pNode = tail.closest('p, div, li') || tail.parentElement;
             return pNode ? pNode.innerText.replace(/⁖/g, '').replace(/\n/g, ' ').trim().substring(0, 15) : "Empty Line";
         }
@@ -999,7 +985,6 @@
                     saveHistory();
                     showToast("⁖ Bookmark Removed");
                 };
-
                 container.appendChild(item);
             });
         }
@@ -1025,7 +1010,6 @@
                     return; 
                 }
             }
-            
             const drop = document.getElementById('drop-anchors'); 
             const isShow = drop.classList.contains('show'); 
             closeAllDropdowns(); 
@@ -1043,7 +1027,6 @@
             anchors.forEach(span => {
                 if (!span.id) span.id = 'kw-' + Math.random().toString(36).substr(2, 9);
                 const spanId = span.id;
-                
                 const kw = span.getAttribute('data-kw') || span.innerText.substring(0, 15); 
                 const item = document.createElement('div'); 
                 item.className = 'dropdown-item'; 
@@ -1063,7 +1046,6 @@
                     sel.removeAllRanges(); 
                     sel.addRange(r);
                     lastCursorPosition = r.cloneRange(); 
-                    
                     panel.focus();
 
                     let pNode = targetSpan.closest('.lexo-paragraph, p, div, li') || targetSpan.parentElement;
@@ -1087,7 +1069,6 @@
             if (sel.rangeCount === 0 && lastCursorPosition) {
                 sel.addRange(lastCursorPosition);
             }
-            
             const range = sel.getRangeAt(0);
             if (!panel.contains(range.commonAncestorContainer)) return;
 
@@ -1157,7 +1138,6 @@
                     sel.removeAllRanges();
                     sel.addRange(r);
                     lastCursorPosition = r.cloneRange();
-
                     panel.focus();
 
                     let pNode = targetSpan.closest('.lexo-paragraph, p, div, li') || targetSpan.parentElement;
@@ -1177,7 +1157,6 @@
                     saveHistory();
                     showToast("📍 Anchor Removed");
                 };
-
                 container.appendChild(item);
             });
         }
@@ -1250,4 +1229,45 @@
 
         function closeAllDropdowns() { document.querySelectorAll('.lexo-dropdown').forEach(d => d.classList.remove('show')); }
         document.addEventListener('click', closeAllDropdowns); document.querySelectorAll('.lexo-dropdown').forEach(d => d.addEventListener('click', (e)=>e.stopPropagation()));
+
+        window.onload = () => { initFileSystem(); };
+
+        document.getElementById('btn-para-move').addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (modeState === "PARA") { resetModes(); return; }
+            forceUnlockAll(); modeState = "PARA"; paraStage = 0;
+            this.classList.add('btn-active');
+            showToast("📖 Block Shift: ON | Double-click to lock paragraph");
+        });
+
+        document.getElementById('btn-phrase-move').addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (modeState === "PHRASE") { resetModes(); return; }
+            forceUnlockAll(); modeState = "PHRASE"; phraseStage = 0;
+            this.classList.add('btn-active');
+            showToast("✂️ Phrase Extraction: ON | Highlight & Double-click start point");
+        });
+
+        function resetModes() {
+            forceUnlockAll(); modeState = "NONE"; paraStage = 0; phraseStage = 0;
+            selectedParaWrapper = null; phraseStartRange = null; 
+            if (phraseCard && phraseCard.parentNode) {
+                const parent = phraseCard.parentNode;
+                while (phraseCard.firstChild) parent.insertBefore(phraseCard.firstChild, phraseCard);
+                parent.removeChild(phraseCard);
+            }
+            phraseCard = null;
+        }
+
+        panel.addEventListener('input', () => {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => { saveCurrentContent(); }, 1500);
+        });
+
+        panel.addEventListener('click', (e) => {
+            if (e.target.tagName.toLowerCase() === 'a') {
+                e.preventDefault();
+                if (confirm(`Open external link: ${e.target.href} ?`)) { window.open(e.target.href, '_blank'); }
+            }
+        });
     </script></body></html>
