@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en" class="notranslate" translate="no"><head>
+!DOCTYPE html><html lang="en" class="notranslate" translate="no"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lexo 3.1 - Intuit Workspace</title>
@@ -245,7 +245,7 @@
             <button class="icon-btn" id="btn-bottom" title="Jump to Bottom">⏬</button>
         </div>
 
-        <button id="btn-sponsor" title="Support the Developer" onclick="alert('接受捐助账号\n\nPaypal: ionlan@outlook.com')">
+        <button id="btn-sponsor" title="Support the Developer" onclick="alert('Donation Account:\n\nPaypal: ionlan@outlook.com')">
             Thanks for Donate
         </button>
     </div>
@@ -378,7 +378,7 @@
         let currentFileId = null;
         let fileSystem = [];
 
-        // 【新增：全局光标监听器】死死咬住你的文字输入点，防止工具栏夺走光标焦点
+        // [Added: Global cursor listener] Lock onto text input point to prevent toolbar focus steal
         document.addEventListener('selectionchange', () => {
             const sel = window.getSelection();
             if (sel.rangeCount > 0) {
@@ -652,7 +652,7 @@
             return node;
         }
 
-        // 【重写：基于文字光标的碎石添加】彻底解决鼠标点击坐标漂移的 Bug
+        // [Rewrite: Gravel insertion based on text cursor] Resolves mouse coordinate drift bug
         document.getElementById('btn-insert-gravel').addEventListener('click', (e) => {
             e.preventDefault(); 
             e.stopPropagation();
@@ -664,10 +664,10 @@
             let node = lastCursorPosition.commonAncestorContainer;
             if (node.nodeType === 3) node = node.parentNode;
             
-            // 精准向上寻找段落容器
+            // Accurately search upwards for paragraph container
             let blockNode = node.closest('.lexo-paragraph, p, div.para-wrapper, h1, h2, h3, li, blockquote');
             
-            // 如果抓到的是外层包裹框，直接指向内部文字段落
+            // If wrapper is caught, point directly to inner text paragraph
             if (blockNode && blockNode.classList.contains('para-wrapper')) {
                 blockNode = blockNode.querySelector('.lexo-paragraph') || blockNode;
             }
@@ -1191,34 +1191,38 @@
         document.getElementById('btn-page-up').addEventListener('click', () => { panel.scrollTop -= fontSizes[currentFontSizeIndex] * 2 * 30; }); 
         document.getElementById('btn-page-down').addEventListener('click', () => { panel.scrollTop += fontSizes[currentFontSizeIndex] * 2 * 30; });
 
-        // 绑定撤销按钮 (Undo)
+        // Bind Undo Button
         document.getElementById('btn-undo').addEventListener('click', (e) => {
             e.stopPropagation();
             if (historyIndex > 0) {
                 historyIndex--;
                 panel.innerHTML = historyStack[historyIndex];
                 saveCurrentContent();
+                // Re-render side panels after structure restore
                 renderGravelList();
                 renderKeywordsList();
                 renderAnchorsList();
-                showToast("↩️ 撤销 (Undo)");
+                showToast("↩️ Undo");
             } else {
+                // Trigger native undo if custom history is empty
                 document.execCommand('undo');
             }
         });
 
-        // 绑定重做按钮 (Redo)
+        // Bind Redo Button
         document.getElementById('btn-redo').addEventListener('click', (e) => {
             e.stopPropagation();
             if (historyIndex < historyStack.length - 1) {
                 historyIndex++;
                 panel.innerHTML = historyStack[historyIndex];
                 saveCurrentContent();
+                // Re-render side panels after structure restore
                 renderGravelList();
                 renderKeywordsList();
                 renderAnchorsList();
-                showToast("↪️ 重做 (Redo)");
+                showToast("↪️ Redo");
             } else {
+                // Trigger native redo if custom history is at latest
                 document.execCommand('redo');
             }
         });
@@ -1316,8 +1320,12 @@
 
         panel.addEventListener('click', (e) => {
             if (e.target.tagName.toLowerCase() === 'a') {
-                e.preventDefault();
-                if (confirm(`Open external link: ${e.target.href} ?`)) { window.open(e.target.href, '_blank'); }
+                // Only prompt for redirect if link is clicked while holding Ctrl (Windows) or Cmd (Mac)
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    if (confirm(`Open external link: ${e.target.href} ?`)) { window.open(e.target.href, '_blank'); }
+                }
+                // Otherwise (normal click), do nothing and allow normal text editing
             }
         });
     </script></body></html>
