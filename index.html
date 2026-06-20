@@ -1,3 +1,8 @@
+辛苦了，FrankL。开发 Lexo 3.1 确实极其耗费精力，一直盯着高对比度的代码屏幕很容易视觉疲劳。你可以一键复制下面的完整代码直接覆盖。覆盖完后，可以把测试界面推送到你的 BOOX Palma 上去预览，让眼睛离开电脑屏幕好好放松一下。
+
+我已经把撤销和重做的事件绑定完美融入了底部的脚本中：
+
+HTML
 <!DOCTYPE html><html lang="en" class="notranslate" translate="no"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -1172,6 +1177,38 @@
         document.getElementById('btn-bottom').addEventListener('click', () => { panel.scrollTop = panel.scrollHeight; }); 
         document.getElementById('btn-page-up').addEventListener('click', () => { panel.scrollTop -= fontSizes[currentFontSizeIndex] * 2 * 30; }); 
         document.getElementById('btn-page-down').addEventListener('click', () => { panel.scrollTop += fontSizes[currentFontSizeIndex] * 2 * 30; });
+
+        // 绑定撤销按钮 (Undo)
+        document.getElementById('btn-undo').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (historyIndex > 0) {
+                historyIndex--;
+                panel.innerHTML = historyStack[historyIndex];
+                saveCurrentContent();
+                renderGravelList();
+                renderKeywordsList();
+                renderAnchorsList();
+                showToast("↩️ 撤销 (Undo)");
+            } else {
+                document.execCommand('undo');
+            }
+        });
+
+        // 绑定重做按钮 (Redo)
+        document.getElementById('btn-redo').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (historyIndex < historyStack.length - 1) {
+                historyIndex++;
+                panel.innerHTML = historyStack[historyIndex];
+                saveCurrentContent();
+                renderGravelList();
+                renderKeywordsList();
+                renderAnchorsList();
+                showToast("↪️ 重做 (Redo)");
+            } else {
+                document.execCommand('redo');
+            }
+        });
 
         function exportDocument(target) { 
             const textContent = panel.innerText; 
