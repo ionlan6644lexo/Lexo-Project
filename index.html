@@ -378,6 +378,17 @@
         let currentFileId = null;
         let fileSystem = [];
 
+        // 【新增：全局光标监听器】死死咬住你的文字输入点，防止工具栏夺走光标焦点
+        document.addEventListener('selectionchange', () => {
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                let r = sel.getRangeAt(0);
+                if (panel.contains(r.commonAncestorContainer)) {
+                    lastCursorPosition = r.cloneRange();
+                }
+            }
+        });
+
         function showToast(msg) {
             toast.innerText = msg; toast.style.display = 'block';
             setTimeout(() => { toast.style.display = 'none'; }, 2000);
@@ -641,22 +652,29 @@
             return node;
         }
 
-        document.getElementById('btn-insert-gravel').addEventListener('mousedown', (e) => {
+        // 【重写：基于文字光标的碎石添加】彻底解决鼠标点击坐标漂移的 Bug
+        document.getElementById('btn-insert-gravel').addEventListener('click', (e) => {
             e.preventDefault(); 
-            panel.focus();
-            const sel = window.getSelection();
-            if (sel.rangeCount === 0 && !lastCursorPosition) {
+            e.stopPropagation();
+            
+            if (!lastCursorPosition) {
                 showToast("⚠️ Place cursor first"); return;
             }
-            if (sel.rangeCount === 0 && lastCursorPosition) {
-                sel.addRange(lastCursorPosition);
+            
+            let node = lastCursorPosition.commonAncestorContainer;
+            if (node.nodeType === 3) node = node.parentNode;
+            
+            // 精准向上寻找段落容器
+            let blockNode = node.closest('.lexo-paragraph, p, div.para-wrapper, h1, h2, h3, li, blockquote');
+            
+            // 如果抓到的是外层包裹框，直接指向内部文字段落
+            if (blockNode && blockNode.classList.contains('para-wrapper')) {
+                blockNode = blockNode.querySelector('.lexo-paragraph') || blockNode;
             }
             
-            const range = sel.getRangeAt(0);
-            if (!panel.contains(range.commonAncestorContainer)) return;
-
-            let blockNode = getPreciseBlockNode(e.clientX, e.clientY);
-            if (!blockNode || blockNode === panel) { showToast("⚠️ Cursor not in a valid block"); return; }
+            if (!blockNode || !panel.contains(blockNode) || blockNode === panel) { 
+                showToast("⚠️ Cursor not in a valid block"); return; 
+            }
             
             const existingTail = blockNode.querySelector('.gravel-tail.active-gravel');
             if (existingTail) {
