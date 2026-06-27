@@ -10,26 +10,42 @@
         #top-toolbar { position: relative; display: flex; justify-content: center; gap: 6vw; align-items: center; height: 54px; padding: 0 10px; background-color: #ffffff; flex-shrink: 0; z-index: 1000; }
         body.mode-high-contrast #top-toolbar { background-color: #000000; }
 
-        /* DONATION BUTTON STYLES (Scaled to 60%) */
+        /* DONATION BUTTON STYLES (Refined Double-line Design) */
         #btn-sponsor { 
             position: absolute; 
-            right: 16px; 
+            right: 8px; 
+            top: 6px;
             text-decoration: none; 
-            color: #000000; 
-            background-color: #ff9900; 
-            font-weight: bold; 
-            font-size: 8pt; 
-            padding: 4px 8px; 
-            border: 1px solid #000000; 
+            color: #1a1a1a; 
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            padding: 4px 10px; 
+            border: 1px solid #b8860b; 
+            border-radius: 4px;
             display: flex; 
+            flex-direction: column;
             align-items: center; 
             justify-content: center; 
-            transform: rotate(5deg); 
-            cursor: pointer; 
+            transform: rotate(4deg); 
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            line-height: 1.1;
+            z-index: 2000;
         }
-        body.mode-high-contrast #btn-sponsor { border-color: #ffffff; }
-        #btn-sponsor:hover { background-color: #e0e0e0; }
-        body.mode-high-contrast #btn-sponsor:hover { background-color: #333333; }
+        body.mode-high-contrast #btn-sponsor { border-color: #ffffff; color: #000000; }
+        #btn-sponsor:hover { filter: brightness(1.1); transform: rotate(2deg) scale(1.02); }
+        
+        .sponsor-top {
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            font-size: 10px;
+            opacity: 0.9;
+        }
+        .sponsor-bottom {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-weight: 900;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
 
         .toolbar-group { display: flex; gap: 2px; align-items: center; position: relative; }
         .icon-btn { width: 42px; height: 42px; font-size: 20px; font-weight: bold; background: transparent; color: inherit; border: 2px solid transparent; cursor: pointer; display: flex; justify-content: center; align-items: center; }
@@ -43,12 +59,11 @@
         .lexo-dropdown.show { display: block; }
         #top-toolbar .lexo-dropdown { top: 46px; }
 
-        .dropdown-title { font-weight: bold; border-bottom: 1px solid currentColor; padding-bottom: 4px; margin-bottom: 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
         .dropdown-item { padding: 8px; border: 1px solid currentColor; margin-bottom: 4px; cursor: pointer; font-size: 13px; word-break: break-all; }
         .dropdown-item:hover { background-color: #e0e0e0; }
         body.mode-high-contrast .dropdown-item:hover { background-color: #333333; }
 
-        .visual-row-slider { margin-bottom: 24px; }
+        .visual-row-slider { margin-bottom: 20px; }
         .visual-row-slider label { display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
         .visual-row-slider label span:last-child { color: #ff9900; }
         
@@ -93,7 +108,7 @@
         .lexo-keyword-anchor { border: none; background: transparent; color: inherit; font-weight: inherit; outline: none; }
 
         .embedded-media-block { display: block; margin: 14px 0; border: 3px solid currentColor; padding: 10px; background-color: transparent; max-width: 100%; outline: none; }
-        .embedded-media-title { font-size: 12px; font-weight: bold; border-bottom: 1px solid currentColor; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; }
+        .embedded-media-title { font-size: 10px; font-weight: bold; border-bottom: 1px solid currentColor; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; }
 
         #status-toast { position: fixed; bottom: 84px; right: 84px; background: #000000; color: #ffffff; padding: 8px 16px; font-size: 14px; display: none; z-index: 9999; border: 1px solid currentColor; text-transform: uppercase; letter-spacing: 0.5px; }
         body.mode-high-contrast #status-toast { background: #ffffff; color: #000000; }
@@ -131,6 +146,8 @@
             transform: rotate(-15deg);
             display: inline-block;
         }
+
+        .mini-label { font-size: 10px; font-weight: bold; margin-bottom: 4px; margin-top: 8px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.5px; }
     </style></head><body class="mode-high-contrast">
 
     <script>
@@ -164,19 +181,18 @@
             
             <button class="icon-btn" id="btn-files" title="Workspace Manager">📜</button>
             <div class="lexo-dropdown" id="drop-files" style="width: 280px;">
-                <div style="display: flex; margin-bottom: 12px; border-bottom: 1px solid currentColor;">
-                    <div class="lexo-tab tab-active" id="tab-files" title="Workspace Directory">📜 Directory</div>
-                    <div class="lexo-tab" id="tab-history" title="Version History">🕰️ History</div>
+                <div style="display: flex; margin-bottom: 8px; border-bottom: 1px solid currentColor;">
+                    <div class="lexo-tab tab-active" id="tab-files" title="Workspace Directory">Directory</div>
+                    <div class="lexo-tab" id="tab-history" title="Version History">History</div>
                 </div>
                 <div id="panel-files">
                     <div class="dropdown-item" onclick="handleNewFileClick(event)" style="font-weight:bold; border-color:currentColor; background:transparent; border-width: 2px;">➕ New Blank File</div>
                     <div class="dropdown-item" onclick="document.getElementById('lexo-file-importer').click()" style="font-weight:bold; border-color:currentColor; background:transparent; border-width: 2px; margin-top:4px;">📥 Import File (.txt / .html)</div>
                     <div class="dropdown-item" onclick="document.getElementById('lexo-workspace-importer').click()" style="font-weight:bold; border-color:currentColor; background:transparent; border-width: 2px; margin-top:4px;">📦 Restore Workspace (.json)</div>
-                    <div class="dropdown-title" style="margin-top:12px;">📁 Saved Files</div>
+                    <div class="mini-label" style="margin-top:12px;">Saved Files</div>
                     <div id="file-list-container"></div>
                 </div>
                 <div id="panel-history" style="display: none;">
-                    <div class="dropdown-title">🕰️ Current Snapshots</div>
                     <div id="version-list-container">
                         <div style="font-size:12px; opacity:0.6; padding:4px;">No historical snapshots.</div>
                     </div>
@@ -185,8 +201,6 @@
 
             <button class="icon-btn" id="btn-visual" title="Visual Settings">👁️</button>
             <div class="lexo-dropdown" id="drop-visual" style="width: 320px;">
-                <div class="dropdown-title">👁️ Visual Scale Control</div>
-                
                 <div class="visual-row-slider">
                     <label><span>Font Size</span> <span id="val-fontsize">20px</span></label>
                     <input type="range" class="lexo-slider" min="0" max="4" value="2" step="1" oninput="handleSliderFontSize(this.value)">
@@ -235,14 +249,11 @@
 
             <button class="icon-btn" id="btn-anchors" title="Index & Anchors">📋</button>
             <div class="lexo-dropdown" id="drop-anchors" style="width: 280px; right: 0;">
-                <div class="dropdown-title">📋 Index & Anchors</div>
-                <div style="font-size: 11px; font-weight: bold; margin-bottom: 4px; opacity: 0.7;">📍 MARGIN ANCHORS</div>
+                <div class="mini-label" style="margin-top: 0;">Margin Anchors</div>
                 <div id="anchor-list-container">
                     <div style="font-size:12px; opacity:0.6; padding:4px;" class="empty-msg">No margin anchors.</div>
                 </div>
-                <div style="font-size: 11px; font-weight: bold; margin-top: 12px; margin-bottom: 4px; opacity: 0.7; display: flex; justify-content: space-between;">
-                    <span>🔑 KEYWORDS</span>
-                </div>
+                <div class="mini-label" style="margin-top: 12px;">Keywords</div>
                 <div id="keyword-list-container">
                     <div style="font-size:12px; opacity:0.6; padding:4px;" class="empty-msg">Use 'Phrase Shift' to select.</div>
                 </div>
@@ -250,7 +261,6 @@
 
             <button class="icon-btn" id="btn-gravel-box" title="Gravel Box" style="color:#ff9900;">⁖🗃️</button>
             <div class="lexo-dropdown" id="drop-gravel-box" style="width: 280px; right: 0;">
-                <div class="dropdown-title" style="color:#ff9900;">⁖ Gravel Box</div>
                 <div id="gravel-list-container">
                     <div style="font-size:12px; opacity:0.6; padding:4px;" class="empty-msg">No bookmarks found.</div>
                 </div>
@@ -263,12 +273,12 @@
         </div>
 
         <button id="btn-sponsor" title="Support the Developer">
-            Thanks for Donate
+            <span class="sponsor-top">Thanks</span>
+            <span class="sponsor-bottom">DONATE</span>
         </button>
-        <div class="lexo-dropdown" id="drop-sponsor" style="position: absolute; right: 16px; top: 46px; width: 220px;">
-            <div class="dropdown-title">☕ Support the Developer</div>
-            <div class="dropdown-item" onclick="alert('Donation Account:\n\nPaypal: ionlan@outlook.com')">💳 PayPal</div>
-            <div class="dropdown-item" onclick="window.open('YOUR_LINK_HERE', '_blank')">☕ Buy Me a Coffee</div>
+        <div class="lexo-dropdown" id="drop-sponsor" style="position: absolute; right: 8px; top: 48px; width: 140px;">
+            <div class="dropdown-item" onclick="alert('Donation Account:\n\nPaypal: ionlan@outlook.com')" style="text-align:center;">💳 PayPal</div>
+            <div class="dropdown-item" onclick="window.open('YOUR_LINK_HERE', '_blank')" style="text-align:center;">☕ Coffee</div>
         </div>
     </div>
 
@@ -281,22 +291,21 @@
         <div style="position: relative;">
             <button class="milestone-btn" id="btn-drawer" title="Material Drawer">📤</button>
             <div class="lexo-dropdown" id="drop-drawer" style="width: 320px; right: 56px; bottom: 0; top: auto;">
-                <div class="dropdown-title">📤 Material Drawer</div>
-                <div style="font-size: 11px; font-weight: bold; margin-bottom: 4px; opacity: 0.7;">COMMON SYMBOLS</div>
+                <div class="mini-label" style="margin-top: 0;">Common Symbols</div>
                 <div class="symbol-grid">
                     <button onclick="executeInsertion('—')">—</button>
                     <button onclick="executeInsertion('…')">…</button>
                     <button onclick="executeInsertion('📌')">📌</button>
                     <button onclick="executeInsertion('★')">★</button>
-                    <button onclick="executeInsertion('《')">《</button>
-                    <button onclick="executeInsertion('》')">》</button>
-                    <button onclick="executeInsertion('“')">“</button>
-                    <button onclick="executeInsertion('”')">”</button>
+                    <button onclick="executeInsertion('[')">[</button>
+                    <button onclick="executeInsertion(']')">]</button>
+                    <button onclick="executeInsertion('{')">{</button>
+                    <button onclick="executeInsertion('}')">}</button>
                     <button onclick="executeInsertion('§')">§</button>
                     <button onclick="executeInsertion('¶')">¶</button>
                     <button onclick="executeInsertion('†')">†</button>
                     <button onclick="executeInsertion('‡')">‡</button>
-                    <button onclick="executeInsertion('※')">※</button>
+                    <button onclick="executeInsertion('•')">•</button>
                     <button onclick="executeInsertion('✓')">✓</button>
                     <button onclick="executeInsertion('✗')">✗</button>
                     <button onclick="executeInsertion('±')">±</button>
@@ -324,7 +333,7 @@
                     <button onclick="executeInsertion('™')">™</button>
                     <button onclick="executeInsertion('⌘')">⌘</button>
                 </div>
-                <div class="dropdown-title" style="margin-top: 8px; border-bottom: 1px dashed currentColor;">SMART COMPONENTS</div>
+                <div class="mini-label" style="margin-top: 12px;">Smart Components</div>
                 <div class="dropdown-item" onclick="triggerInsertDate()">📅 Insert Current Date</div>
                 <div class="dropdown-item" onclick="triggerInsertLink()">🔗 Insert Web Link</div>
                 <div class="dropdown-item" onclick="triggerInsertImage()">🖼️ Insert Image Placeholder</div>
@@ -340,7 +349,6 @@
                 <div style="display:flex; align-items:center; font-size:16px; gap:1px;">➡🚪</div>
             </button>
             <div class="lexo-dropdown" id="drop-export">
-                <div class="dropdown-title">➡🚪 Export Options</div>
                 <div class="dropdown-item" onclick="exportDocument('word')">📄 Export as Word (.doc)</div>
                 <div class="dropdown-item" onclick="exportWorkspace()" style="font-weight:bold;">📦 Backup Workspace (.json)</div>
                 <div class="dropdown-item" style="opacity:0.4; cursor:help;" title="Local Folder Sync (Coming Soon)">📂 Local Folder Sync (Coming Soon)</div>
@@ -1182,11 +1190,19 @@
                 if (!span.id) span.id = 'kw-' + Math.random().toString(36).substr(2, 9);
                 const spanId = span.id;
                 const kw = span.getAttribute('data-kw') || span.innerText.substring(0, 15); 
+                
                 const item = document.createElement('div'); 
                 item.className = 'dropdown-item'; 
-                item.innerHTML = `🔑 ${kw}`;
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.style.alignItems = 'center';
                 
-                item.onclick = (e) => { 
+                item.innerHTML = `
+                    <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;">🔑 ${kw}</span>
+                    <button class="visual-btn" style="padding: 2px 6px; font-size:12px; border:none; margin-left:8px;" title="Remove Keyword">❌</button>
+                `;
+                
+                item.querySelector('span').onclick = (e) => { 
                     e.stopPropagation();
                     const targetSpan = document.getElementById(spanId);
                     if (!targetSpan) return;
@@ -1209,6 +1225,22 @@
                         setTimeout(() => { pNode.style.backgroundColor = originalBg; }, 800); 
                     }
                     closeAllDropdowns(); 
+                };
+
+                item.querySelector('button').onclick = (e) => {
+                    e.stopPropagation();
+                    const targetSpan = document.getElementById(spanId);
+                    if (targetSpan) {
+                        const parent = targetSpan.parentNode;
+                        while (targetSpan.firstChild) {
+                            parent.insertBefore(targetSpan.firstChild, targetSpan);
+                        }
+                        parent.removeChild(targetSpan);
+                    }
+                    renderKeywordsList();
+                    saveCurrentContent();
+                    saveHistory();
+                    showToast("🔑 Keyword Removed");
                 };
                 container.appendChild(item);
             });
