@@ -794,6 +794,37 @@
         });
 
         // ==========================================
+        // PURE TEXT PASTE INTERCEPTOR (NEW)
+        // ==========================================
+        panel.addEventListener('paste', (e) => {
+            e.preventDefault(); // Stop the browser's default dirty paste
+            let text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            if (!text) return;
+
+            // Clean the text and wrap it in Lexo's standard paragraph structure
+            let finalHTML = '';
+            const lines = text.split(/\r?\n/);
+            lines.forEach(line => {
+                const cleanLine = line.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                if (cleanLine) {
+                    finalHTML += `<div class="para-wrapper"><p class="lexo-paragraph">${cleanLine}</p></div>`;
+                }
+            });
+
+            // Insert it at the cursor
+            executeInsertion(finalHTML, true);
+            
+            // Re-apply the current font size to the newly pasted elements
+            handleSliderFontSize(currentFontSizeIndex);
+            
+            // Instantly save a distinct snapshot for the paste action
+            saveHistory();
+            saveCurrentContent();
+            
+            showToast("📋 Clean Paste & Saved");
+        });
+
+        // ==========================================
         // FIXED MULTI-CLICK LOGIC (3 Clicks & 4 Clicks)
         // ==========================================
         let multiClickTimer = null;
@@ -1487,12 +1518,15 @@
             phraseCard = null;
         }
 
+        // ==========================================
+        // OPTIMIZED UNDO TIMER (Reduced to 400ms)
+        // ==========================================
         panel.addEventListener('input', () => {
             clearTimeout(typingTimer);
             typingTimer = setTimeout(() => { 
                 saveHistory();
                 saveCurrentContent(); 
-            }, 800);
+            }, 400); 
         });
 
         document.addEventListener('keydown', (e) => {
