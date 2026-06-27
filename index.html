@@ -10,11 +10,23 @@
         #top-toolbar { position: relative; display: flex; justify-content: center; gap: 6vw; align-items: center; height: 54px; padding: 0 10px; background-color: #ffffff; flex-shrink: 0; z-index: 1000; }
         body.mode-high-contrast #top-toolbar { background-color: #000000; }
 
-        /* ☕ DONATION BUTTON STYLES */
-        #btn-sponsor { position: absolute; right: 16px; text-decoration: none; color: #000000; background-color: #ff9900; font-weight: bold; font-size: 12pt; padding: 6px 12px; border: 2px solid #000000; display: flex; align-items: center; justify-content: center; transform: rotate(5deg); cursor: pointer; }
-        body.mode-high-contrast #btn-sponsor { border-color: #ffffff; }
-        #btn-sponsor:hover { background-color: #e0e0e0; }
-        body.mode-high-contrast #btn-sponsor:hover { background-color: #333333; }
+        /* ☕ DONATION BUTTON STYLES (缩小 60%) */
+        #btn-sponsor { 
+            position: absolute; 
+            right: 16px; 
+            text-decoration: none; 
+            color: #000000; 
+            background-color: #ff9900; 
+            font-weight: bold; 
+            font-size: 8pt; /* 从 12pt 缩小 */
+            padding: 4px 8px; /* 从 6px 12px 缩小 */
+            border: 1px solid #000000; /* 边框从 2px 变细到 1px */
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transform: rotate(5deg); 
+            cursor: pointer; 
+        }
 
         .toolbar-group { display: flex; gap: 2px; align-items: center; position: relative; }
         .icon-btn { width: 42px; height: 42px; font-size: 20px; font-weight: bold; background: transparent; color: inherit; border: 2px solid transparent; cursor: pointer; display: flex; justify-content: center; align-items: center; }
@@ -135,6 +147,7 @@
     </script>
 
     <input type="file" id="lexo-file-importer" accept=".txt,.html,.htm" style="display:none;" onchange="handleFileImport(event)">
+    <input type="file" id="lexo-workspace-importer" accept=".json" style="display:none;" onchange="handleWorkspaceImport(event)">
 
     <div id="top-toolbar">
         <div id="lexo-logo">
@@ -146,20 +159,21 @@
             <button class="icon-btn" id="btn-top" title="Jump to Top">⏫</button>
             <button class="icon-btn" id="btn-page-up" title="Page Up">🔼</button>
             
-            <button class="icon-btn" id="btn-files" title="Workspace Manager">🗂️</button>
+            <button class="icon-btn" id="btn-files" title="Workspace Manager">📜</button>
             <div class="lexo-dropdown" id="drop-files" style="width: 280px;">
                 <div style="display: flex; margin-bottom: 12px; border-bottom: 1px solid currentColor;">
-                    <div class="lexo-tab tab-active" id="tab-files" title="Workspace Directory">🗂️ Directory</div>
-                    <div class="lexo-tab" id="tab-history" title="Version History">📜 History</div>
+                    <div class="lexo-tab tab-active" id="tab-files" title="Workspace Directory">📜 Directory</div>
+                    <div class="lexo-tab" id="tab-history" title="Version History">🕰️ History</div>
                 </div>
                 <div id="panel-files">
                     <div class="dropdown-item" onclick="handleNewFileClick(event)" style="font-weight:bold; border-color:currentColor; background:transparent; border-width: 2px;">➕ New Blank File</div>
                     <div class="dropdown-item" onclick="document.getElementById('lexo-file-importer').click()" style="font-weight:bold; border-color:currentColor; background:transparent; border-width: 2px; margin-top:4px;">📥 Import File (.txt / .html)</div>
+                    <div class="dropdown-item" onclick="document.getElementById('lexo-workspace-importer').click()" style="font-weight:bold; border-color:currentColor; background:transparent; border-width: 2px; margin-top:4px;">📦 Restore Workspace (.json)</div>
                     <div class="dropdown-title" style="margin-top:12px;">📁 Saved Files</div>
                     <div id="file-list-container"></div>
                 </div>
                 <div id="panel-history" style="display: none;">
-                    <div class="dropdown-title">📜 Current Snapshots</div>
+                    <div class="dropdown-title">🕰️ Current Snapshots</div>
                     <div id="version-list-container">
                         <div style="font-size:12px; opacity:0.6; padding:4px;">No historical snapshots.</div>
                     </div>
@@ -320,8 +334,11 @@
             <div class="lexo-dropdown" id="drop-export">
                 <div class="dropdown-title">➡🚪 Export Options</div>
                 <div class="dropdown-item" onclick="exportDocument('word')">📄 Export as Word (.doc)</div>
+                <div class="dropdown-item" onclick="exportWorkspace()" style="font-weight:bold;">📦 Backup Workspace (.json)</div>
+                <div class="dropdown-item" style="opacity:0.4; cursor:help;" title="In future versions, you can choose to auto-sync directly to a local hard drive folder." onclick="alert('🚀 产品规划说明：\n\n未来的版本中，Lexo Intuit 将引入“本地文件夹直接同步”功能。届时，你可以选择继续使用目前的手动打包备份 (.json)，或者授权浏览器自动同步到你的本地硬盘文件夹，甚至可以两者同时使用，确保数据万无一失。')">📂 Local Folder Sync (Coming Soon)</div>
                 <div class="dropdown-item" onclick="exportDocument('google')">🌐 Sync to Google Drive</div>
                 <div class="dropdown-item" onclick="exportDocument('icloud')">🍏 Sync to iCloud</div>
+                <div class="dropdown-item" onclick="shareDocument()">📤 Share to...</div>
                 <div class="dropdown-item" onclick="exportDocument('kindle')">🔥 Send to Kindle (.txt)</div>
                 <div class="dropdown-item" style="opacity:0.4; cursor:not-allowed;" title="Reserved for future version">📚 Send to Kobo (Reserved)</div>
             </div>
@@ -378,7 +395,7 @@
         let currentFileId = null;
         let fileSystem = [];
 
-        // [Added: Global cursor listener] Lock onto text input point to prevent toolbar focus steal
+        // Global cursor listener
         document.addEventListener('selectionchange', () => {
             const sel = window.getSelection();
             if (sel.rangeCount > 0) {
@@ -467,6 +484,7 @@
             switchWorkspaceTab('history');
         }
 
+        // Import individual text or HTML document
         function handleFileImport(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -532,8 +550,77 @@
                 closeAllDropdowns();
                 event.target.value = ''; 
             };
-
             reader.readAsText(file);
+        }
+
+        // Import ENTIRE Workspace JSON
+        function handleWorkspaceImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    // Basic validation
+                    if (Array.isArray(importedData) && importedData.length > 0 && importedData[0].id && importedData[0].title) {
+                        if (confirm("⚠️ WARNING: Importing a Workspace will overwrite your current browser data.\n\nAre you sure you want to proceed?")) {
+                            fileSystem = importedData;
+                            saveFileSystemData();
+                            fileSystem.sort((a, b) => b.lastModified - a.lastModified);
+                            loadFile(fileSystem[0].id);
+                            renderFileList();
+                            showToast("✅ Workspace Successfully Restored!");
+                        }
+                    } else {
+                        alert("❌ Invalid Lexo Workspace backup file.");
+                    }
+                } catch (error) {
+                    alert("❌ Error parsing the JSON backup file.");
+                }
+                event.target.value = ''; // reset input
+                closeAllDropdowns();
+            };
+            reader.readAsText(file);
+        }
+
+        // Export ENTIRE Workspace to JSON
+        function exportWorkspace() {
+            saveCurrentContent(); // Ensure latest text is saved before export
+            const dataStr = JSON.stringify(fileSystem);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            
+            // Format date for filename
+            const now = new Date();
+            const dateStr = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
+            
+            link.download = `Lexo_Workspace_Backup_${dateStr}.json`;
+            link.href = url;
+            link.click();
+            
+            showToast("📦 Workspace Backup Downloaded");
+            closeAllDropdowns();
+        }
+
+        function shareDocument() {
+            const textContent = panel.innerText;
+            const file = fileSystem.find(f => f.id === currentFileId);
+            const docTitle = file ? file.title : "Lexo Intuit Document";
+
+            if (navigator.share) {
+                navigator.share({
+                    title: docTitle,
+                    text: textContent
+                }).then(() => {
+                    showToast("📤 Shared successfully");
+                }).catch((err) => {
+                    console.log("Share canceled or failed", err);
+                });
+            } else {
+                showToast("⚠️ Share API not supported on this device/browser");
+            }
+            closeAllDropdowns();
         }
 
         function initFileSystem() {
@@ -652,7 +739,6 @@
             return node;
         }
 
-        // [Rewrite: Gravel insertion based on text cursor] Resolves mouse coordinate drift bug
         document.getElementById('btn-insert-gravel').addEventListener('click', (e) => {
             e.preventDefault(); 
             e.stopPropagation();
@@ -664,10 +750,8 @@
             let node = lastCursorPosition.commonAncestorContainer;
             if (node.nodeType === 3) node = node.parentNode;
             
-            // Accurately search upwards for paragraph container
             let blockNode = node.closest('.lexo-paragraph, p, div.para-wrapper, h1, h2, h3, li, blockquote');
             
-            // If wrapper is caught, point directly to inner text paragraph
             if (blockNode && blockNode.classList.contains('para-wrapper')) {
                 blockNode = blockNode.querySelector('.lexo-paragraph') || blockNode;
             }
@@ -1194,36 +1278,41 @@
         // Bind Undo Button
         document.getElementById('btn-undo').addEventListener('click', (e) => {
             e.stopPropagation();
+            
+            if (historyIndex >= 0 && panel.innerHTML !== historyStack[historyIndex]) {
+                saveHistory();
+                historyIndex--;
+            }
+
             if (historyIndex > 0) {
                 historyIndex--;
                 panel.innerHTML = historyStack[historyIndex];
                 saveCurrentContent();
-                // Re-render side panels after structure restore
+                
                 renderGravelList();
                 renderKeywordsList();
                 renderAnchorsList();
                 showToast("↩️ Undo");
             } else {
-                // Trigger native undo if custom history is empty
-                document.execCommand('undo');
+                showToast("⚠️ Oldest Snapshot Reached");
             }
         });
 
         // Bind Redo Button
         document.getElementById('btn-redo').addEventListener('click', (e) => {
             e.stopPropagation();
+            
             if (historyIndex < historyStack.length - 1) {
                 historyIndex++;
                 panel.innerHTML = historyStack[historyIndex];
                 saveCurrentContent();
-                // Re-render side panels after structure restore
+                
                 renderGravelList();
                 renderKeywordsList();
                 renderAnchorsList();
                 showToast("↪️ Redo");
             } else {
-                // Trigger native redo if custom history is at latest
-                document.execCommand('redo');
+                showToast("⚠️ Latest Snapshot Reached");
             }
         });
 
@@ -1315,17 +1404,30 @@
 
         panel.addEventListener('input', () => {
             clearTimeout(typingTimer);
-            typingTimer = setTimeout(() => { saveCurrentContent(); }, 1500);
+            typingTimer = setTimeout(() => { 
+                saveHistory();
+                saveCurrentContent(); 
+            }, 800);
         });
 
         panel.addEventListener('click', (e) => {
             if (e.target.tagName.toLowerCase() === 'a') {
-                // Only prompt for redirect if link is clicked while holding Ctrl (Windows) or Cmd (Mac)
                 if (e.ctrlKey || e.metaKey) {
                     e.preventDefault();
                     if (confirm(`Open external link: ${e.target.href} ?`)) { window.open(e.target.href, '_blank'); }
                 }
-                // Otherwise (normal click), do nothing and allow normal text editing
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key.toLowerCase() === 'z' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('btn-undo').click();
+                } else if (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey)) {
+                    e.preventDefault();
+                    document.getElementById('btn-redo').click();
+                }
             }
         });
     </script></body></html>
