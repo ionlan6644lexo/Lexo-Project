@@ -10,7 +10,7 @@
         #top-toolbar { position: relative; display: flex; justify-content: center; gap: 6vw; align-items: center; height: 54px; padding: 0 10px; background-color: #ffffff; flex-shrink: 0; z-index: 1000; }
         body.mode-high-contrast #top-toolbar { background-color: #000000; }
 
-        /* ☕ DONATION BUTTON STYLES (缩小 60%) */
+        /* DONATION BUTTON STYLES (Scaled to 60%) */
         #btn-sponsor { 
             position: absolute; 
             right: 16px; 
@@ -18,15 +18,18 @@
             color: #000000; 
             background-color: #ff9900; 
             font-weight: bold; 
-            font-size: 8pt; /* 从 12pt 缩小 */
-            padding: 4px 8px; /* 从 6px 12px 缩小 */
-            border: 1px solid #000000; /* 边框从 2px 变细到 1px */
+            font-size: 8pt; 
+            padding: 4px 8px; 
+            border: 1px solid #000000; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             transform: rotate(5deg); 
             cursor: pointer; 
         }
+        body.mode-high-contrast #btn-sponsor { border-color: #ffffff; }
+        #btn-sponsor:hover { background-color: #e0e0e0; }
+        body.mode-high-contrast #btn-sponsor:hover { background-color: #333333; }
 
         .toolbar-group { display: flex; gap: 2px; align-items: center; position: relative; }
         .icon-btn { width: 42px; height: 42px; font-size: 20px; font-weight: bold; background: transparent; color: inherit; border: 2px solid transparent; cursor: pointer; display: flex; justify-content: center; align-items: center; }
@@ -98,7 +101,7 @@
         .lexo-tab { flex: 1; text-align: center; padding: 8px 0; cursor: pointer; font-weight: bold; font-size: 13px; text-transform: uppercase; border-bottom: 3px solid transparent; opacity: 0.4; }
         .lexo-tab.tab-active { opacity: 1; border-bottom: 3px solid currentColor; }
 
-        /* 📺 FULLSCREEN INTUIT MODE STYLES */
+        /* FULLSCREEN INTUIT MODE STYLES */
         body.fullscreen-mode #top-toolbar { height: 0; overflow: visible; background-color: transparent !important; pointer-events: none; }
         body.fullscreen-mode .toolbar-group:not(.undo-redo-group) { display: none !important; }
         body.fullscreen-mode #btn-sponsor { display: none !important; }
@@ -110,7 +113,7 @@
         body.fullscreen-mode #milestone-console { display: none !important; }
         body.fullscreen-mode #micro-panel { padding-top: 80px !important; padding-right: 60px !important; }
 
-        /* 🎨 ARTISTIC TOP-LEFT LOGO TEXT */
+        /* ARTISTIC TOP-LEFT LOGO TEXT */
         #lexo-logo {
             position: absolute;
             left: 10px;
@@ -259,9 +262,14 @@
             <button class="icon-btn" id="btn-bottom" title="Jump to Bottom">⏬</button>
         </div>
 
-        <button id="btn-sponsor" title="Support the Developer" onclick="alert('Donation Account:\n\nPaypal: ionlan@outlook.com')">
+        <button id="btn-sponsor" title="Support the Developer">
             Thanks for Donate
         </button>
+        <div class="lexo-dropdown" id="drop-sponsor" style="position: absolute; right: 16px; top: 46px; width: 220px;">
+            <div class="dropdown-title">☕ Support the Developer</div>
+            <div class="dropdown-item" onclick="alert('Donation Account:\n\nPaypal: ionlan@outlook.com')">💳 PayPal</div>
+            <div class="dropdown-item" onclick="window.open('YOUR_LINK_HERE', '_blank')">☕ Buy Me a Coffee</div>
+        </div>
     </div>
 
     <div id="main-workspace">
@@ -335,7 +343,7 @@
                 <div class="dropdown-title">➡🚪 Export Options</div>
                 <div class="dropdown-item" onclick="exportDocument('word')">📄 Export as Word (.doc)</div>
                 <div class="dropdown-item" onclick="exportWorkspace()" style="font-weight:bold;">📦 Backup Workspace (.json)</div>
-                <div class="dropdown-item" style="opacity:0.4; cursor:help;" title="In future versions, you can choose to auto-sync directly to a local hard drive folder." onclick="alert('🚀 产品规划说明：\n\n未来的版本中，Lexo Intuit 将引入“本地文件夹直接同步”功能。届时，你可以选择继续使用目前的手动打包备份 (.json)，或者授权浏览器自动同步到你的本地硬盘文件夹，甚至可以两者同时使用，确保数据万无一失。')">📂 Local Folder Sync (Coming Soon)</div>
+                <div class="dropdown-item" style="opacity:0.4; cursor:help;" title="Local Folder Sync (Coming Soon)">📂 Local Folder Sync (Coming Soon)</div>
                 <div class="dropdown-item" onclick="exportDocument('google')">🌐 Sync to Google Drive</div>
                 <div class="dropdown-item" onclick="exportDocument('icloud')">🍏 Sync to iCloud</div>
                 <div class="dropdown-item" onclick="shareDocument()">📤 Share to...</div>
@@ -355,9 +363,6 @@
         
         const fontSizes = [12, 16, 20, 24, 26];
         let currentFontSizeIndex = 2; 
-        
-        let basecampTimer = null;
-        let clickCount = 0;
         
         function handleSliderFontSize(val) {
             currentFontSizeIndex = parseInt(val);
@@ -780,22 +785,72 @@
             showToast(`⁖ Paragraph Tagged`);
         });
 
+        // ==========================================
+        // FIXED MULTI-CLICK LOGIC (3 Clicks & 4 Clicks)
+        // ==========================================
+        let multiClickTimer = null;
+        let clickCount = 0; 
+
         panel.addEventListener('click', function(e) {
-            clickCount++;
-            if (e.detail === 3 || clickCount === 3) {
-                e.preventDefault(); 
-                if (basecampTimer) {
-                    clearTimeout(basecampTimer);
-                    basecampTimer = null;
+            // Prevent link clicks from triggering workspace multi-clicks
+            if (e.target.tagName.toLowerCase() === 'a') {
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    if (confirm(`Open external link: ${e.target.href} ?`)) { window.open(e.target.href, '_blank'); }
                 }
-                clickCount = 0;
-                document.body.classList.toggle('fullscreen-mode');
-                showToast(document.body.classList.contains('fullscreen-mode') ? "Refreshed | Intuit Mode: ON" : "Refreshed | Intuit Mode: OFF");
-                resetModes(); 
-                window.getSelection().removeAllRanges();
+                return; 
+            }
+
+            clickCount++;
+            
+            // Reset the 400ms countdown on every click
+            if (multiClickTimer) {
+                clearTimeout(multiClickTimer);
+                multiClickTimer = null;
+            }
+            
+            // If 4 clicks are reached instantly, trigger gravel bookmark without waiting
+            if (clickCount === 4) {
+                e.preventDefault();
+                clickCount = 0; // Action completed, reset counter immediately
+                
+                let blockNode = getPreciseBlockNode(e.clientX, e.clientY);
+                if (!blockNode || blockNode === panel) return;
+                
+                if (blockNode.classList.contains('para-wrapper')) {
+                    blockNode = blockNode.querySelector('.lexo-paragraph') || blockNode;
+                }
+                
+                const existingTail = blockNode.querySelector('.gravel-tail.active-gravel');
+                if (existingTail) {
+                    existingTail.remove();
+                    showToast("⁖ Bookmark Removed");
+                } else {
+                    const tail = document.createElement('span');
+                    tail.className = 'gravel-tail active-gravel';
+                    tail.title = `Bookmark`;
+                    tail.contentEditable = "false"; 
+                    tail.innerText = "⁖";
+                    blockNode.appendChild(tail);
+                    showToast(`⁖ Paragraph Tagged`);
+                }
+                renderGravelList(); saveCurrentContent(); saveHistory();
                 return;
             }
-            setTimeout(() => { clickCount = 0; }, 450);
+
+            // If not yet 4 clicks, start the 400ms wait detection
+            multiClickTimer = setTimeout(() => {
+                // After 400ms, if the counter is exactly 3, it means a triple-click. Trigger flow mode.
+                if (clickCount === 3) {
+                    e.preventDefault();
+                    document.body.classList.toggle('fullscreen-mode');
+                    showToast(document.body.classList.contains('fullscreen-mode') ? "Refreshed | Intuit Mode: ON" : "Refreshed | Intuit Mode: OFF");
+                    resetModes(); 
+                    window.getSelection().removeAllRanges();
+                }
+                // Clear counter regardless of outcome after 400ms
+                clickCount = 0; 
+            }, 400); 
         });
 
         panel.addEventListener('dblclick', function(e) {
@@ -810,21 +865,18 @@
 
             if (modeState === "NONE") {
                 if (!basecampCursor) { 
-                    if (basecampTimer) clearTimeout(basecampTimer);
-                    basecampTimer = setTimeout(() => { 
-                        const sel = window.getSelection(); 
-                        if (sel.rangeCount > 0) { 
-                            clearShiftMarker();
-                            const marker = document.createElement('span');
-                            marker.id = 'lexo-shift-marker';
-                            marker.style.cssText = "display:inline-block; width:1px; height:1px; opacity:0;";
-                            sel.getRangeAt(0).insertNode(marker);
+                    const sel = window.getSelection(); 
+                    if (sel.rangeCount > 0) { 
+                        clearShiftMarker();
+                        const marker = document.createElement('span');
+                        marker.id = 'lexo-shift-marker';
+                        marker.style.cssText = "display:inline-block; width:1px; height:1px; opacity:0;";
+                        sel.getRangeAt(0).insertNode(marker);
 
-                            basecampCursor = true; 
-                            document.getElementById('btn-reset-cursor').classList.add('btn-active'); 
-                            showToast("📌 Origin Locked! (Click 🪃 to return)"); 
-                        } 
-                    }, 400); 
+                        basecampCursor = true; 
+                        document.getElementById('btn-reset-cursor').classList.add('btn-active'); 
+                        showToast("📌 Origin Locked! (Click 🪃 to return)"); 
+                    } 
                 }
                 return;
             }
@@ -1369,6 +1421,7 @@
         setupDropdown('btn-export', 'drop-export'); 
         setupDropdown('btn-drawer', 'drop-drawer'); 
         setupDropdown('btn-gravel-box', 'drop-gravel-box');
+        setupDropdown('btn-sponsor', 'drop-sponsor');
 
         function closeAllDropdowns() { document.querySelectorAll('.lexo-dropdown').forEach(d => d.classList.remove('show')); }
         document.addEventListener('click', closeAllDropdowns); document.querySelectorAll('.lexo-dropdown').forEach(d => d.addEventListener('click', (e)=>e.stopPropagation()));
@@ -1408,15 +1461,6 @@
                 saveHistory();
                 saveCurrentContent(); 
             }, 800);
-        });
-
-        panel.addEventListener('click', (e) => {
-            if (e.target.tagName.toLowerCase() === 'a') {
-                if (e.ctrlKey || e.metaKey) {
-                    e.preventDefault();
-                    if (confirm(`Open external link: ${e.target.href} ?`)) { window.open(e.target.href, '_blank'); }
-                }
-            }
         });
 
         document.addEventListener('keydown', (e) => {
