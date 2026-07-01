@@ -148,7 +148,7 @@
         }
 
         .mini-label { font-size: 10px; font-weight: bold; margin-bottom: 4px; margin-top: 8px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.5px; }
-    </style></head><body class="mode-high-contrast">
+    </style><link rel="manifest" href="manifest.json"></head><body class="mode-high-contrast">
 
     <script>
         const ACCESS_KEY = "lexo2026";
@@ -654,8 +654,7 @@
 
             const newFile = {
                 id: 'lexo_file_' + Date.now().toString(), title: fileName,
-                content: `<div class="para-wrapper"><p class="lexo-paragraph">Start drafting your Lexo 3.1 manuscript here...</p></div>`,
-                lastModified: new Date().getTime(), snapshots: []
+            content: `<div class="para-wrapper"><p class="lexo-paragraph"><br></p></div>`,
             };
 
             fileSystem.push(newFile); saveFileSystemData(); loadFile(newFile.id);
@@ -1540,4 +1539,15 @@
                 }
             }
         });
-    </script></body></html>
+    if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(registration => {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            })
+            .catch(err => {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+    });
+}
+</script></body></html>
