@@ -121,6 +121,7 @@
         body.fullscreen-mode .toolbar-group:not(.undo-redo-group) { display: none !important; }
         body.fullscreen-mode #btn-sponsor { display: none !important; }
         body.fullscreen-mode #lexo-logo { display: none !important; }
+        
         body.fullscreen-mode .undo-redo-group { position: fixed; top: 16px; right: 24px; pointer-events: auto; background-color: #ffffff; border: 3px solid #000000; padding: 2px 6px; z-index: 5000; }
         body.mode-high-contrast.fullscreen-mode .undo-redo-group { background-color: #000000; border-color: #ffffff; }
         body.fullscreen-mode .undo-redo-group .separator { display: none; }
@@ -148,10 +149,50 @@
         }
 
         .mini-label { font-size: 10px; font-weight: bold; margin-bottom: 4px; margin-top: 8px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* ==========================================
+           📱 MOBILE PORTRAIT RESPONSIVENESS (仅限手机竖屏)
+           ========================================== */
+        @media screen and (max-width: 768px) and (orientation: portrait) {
+            /* 3. 手机竖向时自动隐藏 Logo */
+            #lexo-logo { display: none !important; }
+
+            /* 4. 彻底取消大间距，所有图标向正中间（Undo/Redo）紧密靠拢 */
+            #top-toolbar { 
+                justify-content: center !important; 
+                gap: 2px !important; 
+                padding-right: 45px !important; /* 给右上角的 Donate 留出位置 */
+                padding-left: 0 !important;
+            }
+
+            /* 组内图标无缝贴合 */
+            .toolbar-group { gap: 0px !important; }
+
+            /* 2. 适应屏幕的图标大小缩放 */
+            .icon-btn { width: 34px !important; height: 34px !important; font-size: 16px !important; }
+            .separator { margin: 0 2px !important; }
+
+            /* 1. 缩小 Donate 按钮并将其牢牢固定在右上角，杜绝压盖 */
+            #btn-sponsor { 
+                transform: scale(0.65) rotate(4deg) !important; 
+                right: -4px !important; 
+                top: 4px !important; 
+                transform-origin: top right;
+            }
+            
+            /* 微调竖屏时下拉菜单的宽度，防止撑破屏幕 */
+            .lexo-dropdown { width: 240px !important; }
+            #milestone-console .lexo-dropdown { right: 45px !important; }
+        }
     </style><link rel="manifest" href="manifest.json"></head><body class="mode-high-contrast">
 
+    <div id="lexo-install-banner" style="display:none; position:fixed; bottom:0; left:0; width:100%; background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%); color:#000; text-align:center; padding:12px; z-index:9999; font-weight:bold; cursor:pointer; box-shadow: 0 -2px 10px rgba(0,0,0,0.3);">
+        📲 Install Lexo App to your Home Screen (Click Here)
+        <span id="close-install" style="float:right; margin-right:15px; font-weight:normal; cursor:pointer;" title="Close">✖</span>
+    </div>
+
     <script>
-        const ACCESS_KEY = "lexo2026";
+        const ACCESS_KEY = "lex";
         const isAuthorized = localStorage.getItem('lexo_auth');
         
         if (isAuthorized !== 'true') {
@@ -356,10 +397,12 @@
                 <div class="dropdown-item" onclick="exportDocument('icloud')">🍏 Sync to iCloud</div>
                 <div class="dropdown-item" onclick="exportDocument('kindle')">🔥 Send to Kindle (.txt)</div>
                 <div class="dropdown-item" onclick="shareDocument()">📤 Share to (System)...</div>
-        <div class="dropdown-item" onclick="shareToGmail()">✉️ Share to Gmail</div>
-        <div class="dropdown-item" onclick="shareToOutlook()">📧 Share to Outlook</div>
+                <div class="dropdown-item" onclick="shareToGmail()">✉️ Share to Gmail</div>
+                <div class="dropdown-item" onclick="shareToOutlook()">📧 Share to Outlook</div>
+                <div class="dropdown-item" style="opacity:0.4; cursor:not-allowed;" title="Reserved for future version">📚 Send to Kobo (Reserved)</div>
+            </div>
+        </div>
     </div>
-</div>
 
     <div id="status-toast"></div>
 
@@ -1551,15 +1594,42 @@
                 }
             }
         });
-    if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(registration => {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            })
-            .catch(err => {
-                console.log('ServiceWorker registration failed: ', err);
+
+        // ==========================================
+        // PERSISTENT PWA INSTALL PROMPT
+        // ==========================================
+        let deferredPrompt;
+        const installBanner = document.getElementById('lexo-install-banner');
+        const closeInstallBtn = document.getElementById('close-install');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); 
+            deferredPrompt = e;
+            installBanner.style.display = 'block'; // 显示常驻横幅
+        });
+
+        installBanner.addEventListener('click', async (e) => {
+            if (e.target === closeInstallBtn) {
+                installBanner.style.display = 'none'; 
+                return;
+            }
+            installBanner.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+            }
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
             });
-    });
-}
-</script></body></html>
+        }
+    </script></body></html>
