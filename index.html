@@ -151,38 +151,44 @@
         .mini-label { font-size: 10px; font-weight: bold; margin-bottom: 4px; margin-top: 8px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* ==========================================
-           📱 MOBILE PORTRAIT RESPONSIVENESS (仅限手机竖屏)
+           📱 MOBILE PORTRAIT RESPONSIVENESS (智能自适应手机竖屏)
            ========================================== */
         @media screen and (max-width: 768px) and (orientation: portrait) {
-            /* 3. 手机竖向时自动隐藏 Logo */
-            #lexo-logo { display: none !important; }
+            /* 1. 自动隐藏 Logo、Donate 按钮以及 4 个快速滚动按键图标 */
+            #lexo-logo, 
+            #btn-sponsor,
+            #btn-top, 
+            #btn-page-up, 
+            #btn-page-down, 
+            #btn-bottom { 
+                display: none !important; 
+            }
 
-            /* 4. 彻底取消大间距，所有图标向正中间（Undo/Redo）紧密靠拢 */
+            /* 2. 让工具栏填满屏幕，两端不留死白，确保整体居中对齐 */
             #top-toolbar { 
                 justify-content: center !important; 
-                gap: 2px !important; 
-                padding-right: 45px !important; /* 给右上角的 Donate 留出位置 */
-                padding-left: 0 !important;
+                gap: 0 !important; 
+                padding: 0 !important;
+                width: 100% !important;
             }
 
-            /* 组内图标无缝贴合 */
+            /* 3. 取消分组内部固定间距，并隐藏分隔粗线 */
             .toolbar-group { gap: 0px !important; }
+            .separator { display: none !important; }
 
-            /* 2. 适应屏幕的图标大小缩放 */
-            .icon-btn { width: 34px !important; height: 34px !important; font-size: 16px !important; }
-            .separator { margin: 0 2px !important; }
-
-            /* 1. 缩小 Donate 按钮并将其牢牢固定在右上角，杜绝压盖 */
-            #btn-sponsor { 
-                transform: scale(0.65) rotate(4deg) !important; 
-                right: -4px !important; 
-                top: 4px !important; 
-                transform-origin: top right;
+            /* 4. 核心自适应：利用 vw 让 10 个功能图标完美等比填满手机屏幕宽度 */
+            .icon-btn { 
+                width: 9.6vw !important; 
+                height: 46px !important; 
+                font-size: 4.8vw !important; /* 图标随屏幕大小平滑缩放 */
+                max-width: 42px !important;   /* 防止在大屏设备上过大 */
+                border-width: 1px !important; 
+                padding: 0 !important;
             }
             
-            /* 微调竖屏时下拉菜单的宽度，防止撑破屏幕 */
+            /* 微调竖屏下拉菜单定位 */
             .lexo-dropdown { width: 240px !important; }
-            #milestone-console .lexo-dropdown { right: 45px !important; }
+            #milestone-console .lexo-dropdown { right: 10px !important; }
         }
     </style><link rel="manifest" href="manifest.json"></head><body class="mode-high-contrast">
 
