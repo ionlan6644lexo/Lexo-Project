@@ -196,3 +196,21 @@ function changeColorMode(mode) { document.body.classList.toggle('mode-classic-bw
 function changeWeight(weight) { document.body.className = document.body.className.replace(/weight-\w+/, `weight-${weight}`); }
 
 renderDrawerList();
+// This function opens the native share panel
+function handleShare() {
+    const text = panel.innerText.trim();
+    if (navigator.share) {
+        navigator.share({ text: text }).catch(() => {});
+    }
+}
+
+// These functions target specific services directly
+function shareToGmail() {
+    const text = encodeURIComponent(panel.innerText.trim());
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&body=${text}`, '_blank');
+}
+
+function shareToOutlook() {
+    const text = encodeURIComponent(panel.innerText.trim());
+    window.open(`https://outlook.live.com/mail/0/deeplink/compose?body=${text}`, '_blank');
+}

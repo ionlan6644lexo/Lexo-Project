@@ -120,7 +120,7 @@
         body.fullscreen-mode #top-toolbar { height: 0; overflow: visible; background-color: transparent !important; pointer-events: none; }
         body.fullscreen-mode .toolbar-group:not(.undo-redo-group) { display: none !important; }
         body.fullscreen-mode #btn-sponsor { display: none !important; }
-        
+        body.fullscreen-mode #lexo-logo { display: none !important; }
         body.fullscreen-mode .undo-redo-group { position: fixed; top: 16px; right: 24px; pointer-events: auto; background-color: #ffffff; border: 3px solid #000000; padding: 2px 6px; z-index: 5000; }
         body.mode-high-contrast.fullscreen-mode .undo-redo-group { background-color: #000000; border-color: #ffffff; }
         body.fullscreen-mode .undo-redo-group .separator { display: none; }
@@ -354,12 +354,12 @@
                 <div class="dropdown-item" style="opacity:0.4; cursor:help;" title="Local Folder Sync (Coming Soon)">📂 Local Folder Sync (Coming Soon)</div>
                 <div class="dropdown-item" onclick="exportDocument('google')">🌐 Sync to Google Drive</div>
                 <div class="dropdown-item" onclick="exportDocument('icloud')">🍏 Sync to iCloud</div>
-                <div class="dropdown-item" onclick="shareDocument()">📤 Share to...</div>
                 <div class="dropdown-item" onclick="exportDocument('kindle')">🔥 Send to Kindle (.txt)</div>
-                <div class="dropdown-item" style="opacity:0.4; cursor:not-allowed;" title="Reserved for future version">📚 Send to Kobo (Reserved)</div>
-            </div>
-        </div>
+                <div class="dropdown-item" onclick="shareDocument()">📤 Share to (System)...</div>
+        <div class="dropdown-item" onclick="shareToGmail()">✉️ Share to Gmail</div>
+        <div class="dropdown-item" onclick="shareToOutlook()">📧 Share to Outlook</div>
     </div>
+</div>
 
     <div id="status-toast"></div>
 
@@ -633,6 +633,18 @@
             } else {
                 showToast("⚠️ Share API not supported on this device/browser");
             }
+            closeAllDropdowns();
+        }
+
+        function shareToGmail() {
+            const text = encodeURIComponent(panel.innerText.trim());
+            window.open(`https://mail.google.com/mail/?view=cm&fs=1&body=${text}`, '_blank');
+            closeAllDropdowns();
+        }
+
+        function shareToOutlook() {
+            const text = encodeURIComponent(panel.innerText.trim());
+            window.open(`https://outlook.live.com/mail/0/deeplink/compose?body=${text}`, '_blank');
             closeAllDropdowns();
         }
 
