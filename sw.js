@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lexo-intuit-v1';
+const CACHE_NAME = 'lexo-intuit-v3.30';
 const urlsToCache = [
   './',
   './index.html',
