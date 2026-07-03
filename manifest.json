@@ -1,6 +1,7 @@
 {
   "name": "Lexo Intuit",
   "short_name": "Lexo I",
+  "author": "Yang LAN",
   "description": "A focused, zero-drag writing environment.",
   "start_url": "./index.html",
   "display": "standalone",
