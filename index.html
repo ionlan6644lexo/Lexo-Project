@@ -1,22 +1,25 @@
-<!DOCTYPE html><html lang="en" class="notranslate" translate="no"><head>
+<!DOCTYPE html>
+<html lang="en" class="notranslate" translate="no">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-title" content="Lexo I">
-<meta name="author" content="Yang LAN">
-<meta name="copyright" content="Copyright © 2026 Yang (Frank) Lan. All Rights Reserved.">
+    <meta name="author" content="Yang LAN">
+    <meta name="copyright" content="Copyright © 2026 Yang (Frank) Lan. All Rights Reserved.">
     <title>Lexo Intuit 3.3 - Intuit Workspace</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; transition: none !important; -webkit-tap-highlight-color: transparent; }
         body { display: flex; flex-direction: column; height: 100vh; background-color: #ffffff !important; color: #000000 !important; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }
         body.mode-high-contrast { background-color: #000000 !important; color: #ffffff !important; }
 
-        #top-toolbar { position: relative; display: flex; justify-content: center; gap: 6vw; align-items: center; height: 54px; padding: 0 10px; background-color: #ffffff; flex-shrink: 0; z-index: 1000; }
+        /* Adjusted padding and gap to prevent Logo and Donate banner overlapping */
+        #top-toolbar { position: relative; display: flex; justify-content: center; gap: 4vw; align-items: center; height: 54px; padding: 0 100px 0 20px; background-color: #ffffff; flex-shrink: 0; z-index: 1000; box-sizing: border-box; }
         body.mode-high-contrast #top-toolbar { background-color: #000000; }
 
         /* DONATION BUTTON STYLES (Refined Double-line Design) */
         #btn-sponsor { 
             position: absolute; 
-            right: 8px; 
+            right: 12px; 
             top: 6px;
             text-decoration: none; 
             color: #1a1a1a; 
@@ -28,10 +31,11 @@
             flex-direction: column;
             align-items: center; 
             justify-content: center; 
-            transform: rotate(4deg); 
+            transform: rotate(3deg); 
             cursor: pointer;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
             line-height: 1.1;
+            white-space: nowrap;
             z-index: 2000;
         }
         body.mode-high-contrast #btn-sponsor { border-color: #ffffff; color: #000000; }
@@ -154,7 +158,7 @@
         .mini-label { font-size: 10px; font-weight: bold; margin-bottom: 4px; margin-top: 8px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* ==========================================
-           📱 MOBILE PORTRAIT RESPONSIVENESS (手机竖屏：核心聚焦模式)
+           📱 MOBILE PORTRAIT RESPONSIVENESS (Core Focus Mode)
            ========================================== */
         @media screen and (max-width: 768px) and (orientation: portrait) {
             #lexo-logo, #btn-sponsor, #btn-top, #btn-page-up, #btn-page-down, #btn-bottom, #btn-files, #btn-visual { 
@@ -173,21 +177,24 @@
         }
 
         /* ==========================================
-           📱 MOBILE LANDSCAPE RESPONSIVENESS (手机横屏防遮挡终极优化)
+           📱 MOBILE LANDSCAPE RESPONSIVENESS (Anti-Overlap Optimization)
            ========================================== */
         @media screen and (max-width: 950px) and (orientation: landscape) {
             #btn-sponsor {
-                transform: scale(0.7) rotate(15deg) !important; /* 倾斜角度大幅增加至 15 度，更小巧 */
-                right: -2px !important; /* 进一步向右推挤 */
+                transform: scale(0.7) rotate(15deg) !important; /* Increase tilt to 15 degrees, scale down */
+                right: -2px !important; /* Push further right */
                 top: 2px !important;
-                padding: 2px 6px !important; /* 横幅长度缩短 */
+                padding: 2px 6px !important; /* Shorten banner padding */
                 transform-origin: top right;
             }
             #top-toolbar {
-                padding-right: 65px !important; /* 为最右侧快速滚动图标强制预留 65px 禁飞区，彻底物理隔离 Donate */
+                padding-right: 65px !important; /* Force 65px padding for right-side scroll icons to isolate Donate button */
             }
         }
-    </style><link rel="manifest" href="manifest.json"></head><body class="mode-high-contrast">
+    </style>
+    <link rel="manifest" href="manifest.json">
+</head>
+<body class="mode-high-contrast">
 
     <div id="lexo-install-banner" style="display:none; position:fixed; bottom:0; left:0; width:100%; background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%); color:#000; text-align:center; padding:12px; z-index:9999; font-weight:bold; cursor:pointer; box-shadow: 0 -2px 10px rgba(0,0,0,0.3);">
         📲 Install Lexo App to your Home Screen (Click Here)
@@ -389,20 +396,35 @@
         <button class="milestone-btn" id="btn-stop" title="Save Milestone Snapshot">⏹️</button>
         
         <div style="position: relative;">
-            <button class="milestone-btn" id="btn-export" title="Export Project">
-                <div style="display:flex; align-items:center; font-size:16px; gap:1px;">➡🚪</div>
+            <button class="milestone-btn" id="btn-export" title="Export & Share">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="vertical-align: middle;">
+                    <path d="M14 5V9C7 10 4 15 3 20C5.5 16.5 9 14.9 14 14.9V19L21 12L14 5Z"/>
+                </svg>
             </button>
-            <div class="lexo-dropdown" id="drop-export">
+            <div class="lexo-dropdown" id="drop-export" style="width: 240px; right: 56px; bottom: 0; top: auto; max-height: 80vh; overflow-y: auto;">
+                <div class="dropdown-item" onclick="copyToClipboard()" style="font-weight:bold; border-width: 2px;">📋 Copy to Clipboard</div>
+                <div class="dropdown-item" onclick="shareDocument()">📤 share to...</div>
+                
+                <div class="mini-label" style="margin-top: 12px;">Files & Sync</div>
                 <div class="dropdown-item" onclick="exportDocument('word')">📄 Export as Word (.doc)</div>
-                <div class="dropdown-item" onclick="exportWorkspace()" style="font-weight:bold;">📦 Backup Workspace (.json)</div>
-                <div class="dropdown-item" style="opacity:0.4; cursor:help;" title="Local Folder Sync (Coming Soon)">📂 Local Folder Sync (Coming Soon)</div>
+                <div class="dropdown-item" onclick="exportWorkspace()">📦 Backup Workspace (.json)</div>
                 <div class="dropdown-item" onclick="exportDocument('google')">🌐 Sync to Google Drive</div>
                 <div class="dropdown-item" onclick="exportDocument('icloud')">🍏 Sync to iCloud</div>
                 <div class="dropdown-item" onclick="exportDocument('kindle')">🔥 Send to Kindle (.txt)</div>
-                <div class="dropdown-item" onclick="shareDocument()">📤 Share to (System)...</div>
+                
+                <div class="mini-label" style="margin-top: 12px;">Social Media</div>
+                <div class="dropdown-item" onclick="shareToPlatform('facebook')">Facebook</div>
+                <div class="dropdown-item" onclick="shareToPlatform('x')">X (Twitter)</div>
+                <div class="dropdown-item" onclick="shareToPlatform('bluesky')">Bluesky</div>
+                <div class="dropdown-item" onclick="shareToPlatform('mastodon')">Mastodon</div>
+                <div class="dropdown-item" onclick="shareToPlatform('blogger')">Blogger</div>
+                <div class="dropdown-item" onclick="shareToPlatform('wordpress')">WordPress</div>
+                <div class="dropdown-item" onclick="shareToPlatform('reddit')">Reddit</div>
+                <div class="dropdown-item" onclick="shareToPlatform('instagram')">Instagram</div>
+
+                <div class="mini-label" style="margin-top: 12px;">Email</div>
                 <div class="dropdown-item" onclick="shareToGmail()">✉️ Share to Gmail</div>
                 <div class="dropdown-item" onclick="shareToOutlook()">📧 Share to Outlook</div>
-                <div class="dropdown-item" style="opacity:0.4; cursor:not-allowed;">📚 Send to Kobo (Reserved for future update)</div>
             </div>
         </div>
     </div>
@@ -662,6 +684,16 @@
             closeAllDropdowns();
         }
 
+        function copyToClipboard() {
+            const textContent = panel.innerText;
+            navigator.clipboard.writeText(textContent).then(() => {
+                showToast("📋 Copied to Clipboard");
+            }).catch(err => {
+                showToast("⚠️ Copy failed");
+            });
+            closeAllDropdowns();
+        }
+
         function shareDocument() {
             const textContent = panel.innerText;
             const file = fileSystem.find(f => f.id === currentFileId);
@@ -678,6 +710,32 @@
                 });
             } else {
                 showToast("⚠️ Share API not supported on this device/browser");
+            }
+            closeAllDropdowns();
+        }
+
+        function shareToPlatform(platform) {
+            const text = encodeURIComponent(panel.innerText.trim());
+            const url = encodeURIComponent(window.location.href);
+            let shareUrl = "";
+            
+            switch(platform) {
+                case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`; break;
+                case 'x': shareUrl = `https://twitter.com/intent/tweet?text=${text}`; break;
+                case 'bluesky': shareUrl = `https://bsky.app/intent/compose?text=${text}`; break;
+                case 'mastodon': shareUrl = `https://mastodonsocial.com/share?text=${text}`; break;
+                case 'blogger': shareUrl = `https://www.blogger.com/blog-this.g?t=${text}`; break;
+                case 'wordpress': shareUrl = `https://wordpress.com/wp-admin/press-this.php?u=${url}&t=${text}`; break;
+                case 'reddit': shareUrl = `https://www.reddit.com/submit?title=Lexo&text=${text}`; break;
+                case 'instagram': 
+                    showToast("⚠️ Instagram does not support direct web text sharing. Please copy text first."); 
+                    copyToClipboard(); 
+                    return;
+            }
+            
+            if (shareUrl) {
+                window.open(shareUrl, '_blank');
+                showToast(`📤 Opening ${platform.charAt(0).toUpperCase() + platform.slice(1)}`);
             }
             closeAllDropdowns();
         }
@@ -1608,7 +1666,7 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault(); 
             deferredPrompt = e;
-            installBanner.style.display = 'block'; // 显示常驻横幅
+            installBanner.style.display = 'block'; // Show persistent banner
         });
 
         installBanner.addEventListener('click', async (e) => {
@@ -1635,4 +1693,6 @@
                     });
             });
         }
-    </script></body></html>
+    </script>
+</body>
+</html>
