@@ -412,21 +412,25 @@
                 <div class="dropdown-item" onclick="exportDocument('icloud')">🍏 Sync to iCloud</div>
                 <div class="dropdown-item" onclick="exportDocument('kindle')">🔥 Send to Kindle (.txt)</div>
                 
-                <div class="mini-label" style="margin-top: 12px;">Social Media</div>
-                <div class="dropdown-item" onclick="shareToPlatform('facebook')">Facebook</div>
-                <div class="dropdown-item" onclick="shareToPlatform('x')">X (Twitter)</div>
-                <div class="dropdown-item" onclick="shareToPlatform('bluesky')">Bluesky</div>
-                <div class="dropdown-item" onclick="shareToPlatform('mastodon')">Mastodon</div>
-                <div class="dropdown-item" onclick="shareToPlatform('blogger')">Blogger</div>
-                <div class="dropdown-item" onclick="shareToPlatform('wordpress')">WordPress</div>
-                <div class="dropdown-item" onclick="shareToPlatform('reddit')">Reddit</div>
-                <div class="dropdown-item" onclick="shareToPlatform('instagram')">Instagram</div>
+                <div class="dropdown-item" onclick="toggleSocialMedia(event)" style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Social Media</span>
+                    <span id="sm-arrow" style="font-size: 10px;">▼</span>
+                </div>
+                <div id="social-media-group" style="display:none; padding-left: 12px; border-left: 1px solid currentColor; margin-left: 6px; margin-bottom: 4px; opacity: 0.9;">
+                    <div class="dropdown-item" style="border:none; padding: 6px 8px; margin-bottom: 0;" onclick="shareToPlatform('facebook')">Facebook</div>
+                    <div class="dropdown-item" style="border:none; padding: 6px 8px; margin-bottom: 0;" onclick="shareToPlatform('x')">X (Twitter)</div>
+                    <div class="dropdown-item" style="border:none; padding: 6px 8px; margin-bottom: 0;" onclick="shareToPlatform('bluesky')">Bluesky</div>
+                    <div class="dropdown-item" style="border:none; padding: 6px 8px; margin-bottom: 0;" onclick="shareToPlatform('mastodon')">Mastodon</div>
+                    <div class="dropdown-item" style="border:none; padding: 6px 8px; margin-bottom: 0;" onclick="shareToPlatform('blogger')">Blogger</div>
+                    <div class="dropdown-item" style="border:none; padding: 6px 8px; margin-bottom: 0;" onclick="shareToPlatform('wordpress')">WordPress</div>
+                    <div class="dropdown-item" style="border:none; padding: 6px 8px; margin-bottom: 0;" onclick="shareToPlatform('reddit')">Reddit</div>
+                    <div class="dropdown-item" style="border:none; padding: 6px 8px; margin-bottom: 0;" onclick="shareToPlatform('instagram')">Instagram</div>
+                </div>
 
                 <div class="mini-label" style="margin-top: 12px;">Email</div>
                 <div class="dropdown-item" onclick="shareToGmail()">✉️ Share to Gmail</div>
                 <div class="dropdown-item" onclick="shareToOutlook()">📧 Share to Outlook</div>
-            </div>
-        </div>
+            </div>        </div>
     </div>
 
     <div id="status-toast"></div>
@@ -714,6 +718,20 @@
             closeAllDropdowns();
         }
 
+        // Added JS Function for expanding/collapsing Social Media
+        function toggleSocialMedia(e) {
+            e.stopPropagation();
+            const group = document.getElementById('social-media-group');
+            const arrow = document.getElementById('sm-arrow');
+            if (group.style.display === 'none') {
+                group.style.display = 'block';
+                arrow.innerText = '▲';
+            } else {
+                group.style.display = 'none';
+                arrow.innerText = '▼';
+            }
+        }
+
         function shareToPlatform(platform) {
             const text = encodeURIComponent(panel.innerText.trim());
             const url = encodeURIComponent(window.location.href);
@@ -746,9 +764,27 @@
             closeAllDropdowns();
         }
 
+        // UPDATED Outlook Sharing Function
         function shareToOutlook() {
-            const text = encodeURIComponent(panel.innerText.trim());
-            window.open(`https://outlook.live.com/mail/0/deeplink/compose?body=${text}`, '_blank');
+            const rawText = panel.innerText.trim();
+            const text = encodeURIComponent(rawText);
+            
+            // Fix: OS-level intercepts often force native Outlook app which drops the body parameter.
+            // Using the legacy OWA compose path forces the web browser behavior more reliably.
+            // Additionally, handling URL length limits (>1500 chars) prevents empty emails.
+            if (rawText.length > 1500) {
+                navigator.clipboard.writeText(rawText).then(() => {
+                    showToast("📝 Content too long! Copied to clipboard. Please paste in Web Outlook.");
+                    setTimeout(() => {
+                        window.open('https://outlook.live.com/owa/?path=/mail/action/compose', '_blank');
+                    }, 1500);
+                }).catch(err => {
+                    // Fallback if clipboard API is restricted
+                    window.open(`https://outlook.live.com/owa/?path=/mail/action/compose&body=${text.substring(0, 1500)}...`, '_blank');
+                });
+            } else {
+                window.open(`https://outlook.live.com/owa/?path=/mail/action/compose&body=${text}`, '_blank');
+            }
             closeAllDropdowns();
         }
 
