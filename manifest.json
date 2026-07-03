@@ -1,6 +1,6 @@
 {
   "name": "Lexo Intuit",
-  "short_name": "Intuit",
+  "short_name": "Lexo I",
   "description": "A focused, zero-drag writing environment.",
   "start_url": "./index.html",
   "display": "standalone",
