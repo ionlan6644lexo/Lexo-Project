@@ -181,14 +181,14 @@
            ========================================== */
         @media screen and (max-width: 950px) and (orientation: landscape) {
             #btn-sponsor {
-                transform: scale(0.7) rotate(15deg) !important; /* Increase tilt to 15 degrees, scale down */
-                right: -2px !important; /* Push further right */
+                transform: scale(0.7) rotate(15deg) !important;
+                right: -2px !important; 
                 top: 2px !important;
-                padding: 2px 6px !important; /* Shorten banner padding */
+                padding: 2px 6px !important; 
                 transform-origin: top right;
             }
             #top-toolbar {
-                padding-right: 65px !important; /* Force 65px padding for right-side scroll icons to isolate Donate button */
+                padding-right: 65px !important; 
             }
         }
     </style>
@@ -398,12 +398,18 @@
         <div style="position: relative;">
             <button class="milestone-btn" id="btn-export" title="Export & Share">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="vertical-align: middle;">
-                    <path d="M14 5V9C7 10 4 15 3 20C5.5 16.5 9 14.9 14 14.9V19L21 12L14 5Z"/>
+                    <path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
                 </svg>
             </button>
             <div class="lexo-dropdown" id="drop-export" style="width: 240px; right: 56px; bottom: 0; top: auto; max-height: 80vh; overflow-y: auto;">
                 <div class="dropdown-item" onclick="copyToClipboard()" style="font-weight:bold; border-width: 2px;">📋 Copy to Clipboard</div>
-                <div class="dropdown-item" onclick="shareDocument()">📤 share to...</div>
+                
+                <div class="dropdown-item" onclick="shareDocument()" style="display: flex; align-items: center; gap: 8px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M14 5V9C7 10 4 15 3 20C5.5 16.5 9 14.9 14 14.9V19L21 12L14 5Z"/>
+                    </svg>
+                    share to...
+                </div>
                 
                 <div class="mini-label" style="margin-top: 12px;">Files & Sync</div>
                 <div class="dropdown-item" onclick="exportDocument('word')">📄 Export as Word (.doc)</div>
@@ -412,6 +418,8 @@
                 <div class="dropdown-item" onclick="exportDocument('icloud')">🍏 Sync to iCloud</div>
                 <div class="dropdown-item" onclick="exportDocument('kindle')">🔥 Send to Kindle (.txt)</div>
                 
+                <div class="dropdown-item" onclick="showToast('📘 Reserved for future update')">📘 Send to Kobo (Reserved)</div>
+
                 <div class="dropdown-item" onclick="toggleSocialMedia(event)" style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
                     <span>Social Media</span>
                     <span id="sm-arrow" style="font-size: 10px;">▼</span>
@@ -430,7 +438,8 @@
                 <div class="mini-label" style="margin-top: 12px;">Email</div>
                 <div class="dropdown-item" onclick="shareToGmail()">✉️ Share to Gmail</div>
                 <div class="dropdown-item" onclick="shareToOutlook()">📧 Share to Outlook</div>
-            </div>        </div>
+            </div>
+        </div>
     </div>
 
     <div id="status-toast"></div>
@@ -480,7 +489,6 @@
         let currentFileId = null;
         let fileSystem = [];
 
-        // Global cursor listener
         document.addEventListener('selectionchange', () => {
             const sel = window.getSelection();
             if (sel.rangeCount > 0) {
@@ -569,7 +577,6 @@
             switchWorkspaceTab('history');
         }
 
-        // Import individual text or HTML document
         function handleFileImport(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -638,7 +645,6 @@
             reader.readAsText(file);
         }
 
-        // Import ENTIRE Workspace JSON
         function handleWorkspaceImport(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -646,7 +652,6 @@
             reader.onload = function(e) {
                 try {
                     const importedData = JSON.parse(e.target.result);
-                    // Basic validation
                     if (Array.isArray(importedData) && importedData.length > 0 && importedData[0].id && importedData[0].title) {
                         if (confirm("⚠️ WARNING: Importing a Workspace will overwrite your current browser data.\n\nAre you sure you want to proceed?")) {
                             fileSystem = importedData;
@@ -662,21 +667,19 @@
                 } catch (error) {
                     alert("❌ Error parsing the JSON backup file.");
                 }
-                event.target.value = ''; // reset input
+                event.target.value = ''; 
                 closeAllDropdowns();
             };
             reader.readAsText(file);
         }
 
-        // Export ENTIRE Workspace to JSON
         function exportWorkspace() {
-            saveCurrentContent(); // Ensure latest text is saved before export
+            saveCurrentContent(); 
             const dataStr = JSON.stringify(fileSystem);
             const blob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             
-            // Format date for filename
             const now = new Date();
             const dateStr = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
             
@@ -718,7 +721,6 @@
             closeAllDropdowns();
         }
 
-        // Added JS Function for expanding/collapsing Social Media
         function toggleSocialMedia(e) {
             e.stopPropagation();
             const group = document.getElementById('social-media-group');
@@ -733,12 +735,17 @@
         }
 
         function shareToPlatform(platform) {
-            const text = encodeURIComponent(panel.innerText.trim());
+            const rawText = panel.innerText.trim();
+            const text = encodeURIComponent(rawText);
             const url = encodeURIComponent(window.location.href);
             let shareUrl = "";
             
             switch(platform) {
-                case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`; break;
+                case 'facebook': 
+                    navigator.clipboard.writeText(rawText);
+                    showToast("⚠️ Facebook 限制直传文本。已复制，请在弹窗内粘贴。");
+                    shareUrl = `https://www.facebook.com/`; 
+                    break;
                 case 'x': shareUrl = `https://twitter.com/intent/tweet?text=${text}`; break;
                 case 'bluesky': shareUrl = `https://bsky.app/intent/compose?text=${text}`; break;
                 case 'mastodon': shareUrl = `https://mastodonsocial.com/share?text=${text}`; break;
@@ -764,26 +771,17 @@
             closeAllDropdowns();
         }
 
-        // UPDATED Outlook Sharing Function
         function shareToOutlook() {
             const rawText = panel.innerText.trim();
             const text = encodeURIComponent(rawText);
             
-            // Fix: OS-level intercepts often force native Outlook app which drops the body parameter.
-            // Using the legacy OWA compose path forces the web browser behavior more reliably.
-            // Additionally, handling URL length limits (>1500 chars) prevents empty emails.
             if (rawText.length > 1500) {
                 navigator.clipboard.writeText(rawText).then(() => {
-                    showToast("📝 Content too long! Copied to clipboard. Please paste in Web Outlook.");
-                    setTimeout(() => {
-                        window.open('https://outlook.live.com/owa/?path=/mail/action/compose', '_blank');
-                    }, 1500);
-                }).catch(err => {
-                    // Fallback if clipboard API is restricted
-                    window.open(`https://outlook.live.com/owa/?path=/mail/action/compose&body=${text.substring(0, 1500)}...`, '_blank');
+                    showToast("📝 文本过长已复制！正在拉起邮件客户端，请直接粘贴。");
+                    setTimeout(() => { window.location.href = `mailto:?subject=Lexo Document`; }, 1500);
                 });
             } else {
-                window.open(`https://outlook.live.com/owa/?path=/mail/action/compose&body=${text}`, '_blank');
+                window.location.href = `mailto:?subject=Lexo Document&body=${text}`;
             }
             closeAllDropdowns();
         }
@@ -944,15 +942,11 @@
             showToast(`⁖ Paragraph Tagged`);
         });
 
-        // ==========================================
-        // PURE TEXT PASTE INTERCEPTOR (NEW)
-        // ==========================================
         panel.addEventListener('paste', (e) => {
-            e.preventDefault(); // Stop the browser's default dirty paste
+            e.preventDefault(); 
             let text = (e.clipboardData || window.clipboardData).getData('text/plain');
             if (!text) return;
 
-            // Clean the text and wrap it in Lexo's standard paragraph structure
             let finalHTML = '';
             const lines = text.split(/\r?\n/);
             lines.forEach(line => {
@@ -962,27 +956,18 @@
                 }
             });
 
-            // Insert it at the cursor
             executeInsertion(finalHTML, true);
-            
-            // Re-apply the current font size to the newly pasted elements
             handleSliderFontSize(currentFontSizeIndex);
-            
-            // Instantly save a distinct snapshot for the paste action
             saveHistory();
             saveCurrentContent();
             
             showToast("📋 Clean Paste & Saved");
         });
 
-        // ==========================================
-        // FIXED MULTI-CLICK LOGIC (3 Clicks & 4 Clicks)
-        // ==========================================
         let multiClickTimer = null;
         let clickCount = 0; 
 
         panel.addEventListener('click', function(e) {
-            // Prevent link clicks from triggering workspace multi-clicks
             if (e.target.tagName.toLowerCase() === 'a') {
                 if (e.ctrlKey || e.metaKey) {
                     e.preventDefault();
@@ -993,16 +978,14 @@
 
             clickCount++;
             
-            // Reset the 400ms countdown on every click
             if (multiClickTimer) {
                 clearTimeout(multiClickTimer);
                 multiClickTimer = null;
             }
             
-            // If 4 clicks are reached instantly, trigger gravel bookmark without waiting
             if (clickCount === 4) {
                 e.preventDefault();
-                clickCount = 0; // Action completed, reset counter immediately
+                clickCount = 0; 
                 
                 let blockNode = getPreciseBlockNode(e.clientX, e.clientY);
                 if (!blockNode || blockNode === panel) return;
@@ -1028,9 +1011,7 @@
                 return;
             }
 
-            // If not yet 4 clicks, start the 400ms wait detection
             multiClickTimer = setTimeout(() => {
-                // After 400ms, if the counter is exactly 3, it means a triple-click. Trigger flow mode.
                 if (clickCount === 3) {
                     e.preventDefault();
                     document.body.classList.toggle('fullscreen-mode');
@@ -1038,7 +1019,6 @@
                     resetModes(); 
                     window.getSelection().removeAllRanges();
                 }
-                // Clear counter regardless of outcome after 400ms
                 clickCount = 0; 
             }, 400); 
         });
@@ -1541,7 +1521,6 @@
         document.getElementById('btn-page-up').addEventListener('click', () => { panel.scrollTop -= fontSizes[currentFontSizeIndex] * 2 * 30; }); 
         document.getElementById('btn-page-down').addEventListener('click', () => { panel.scrollTop += fontSizes[currentFontSizeIndex] * 2 * 30; });
 
-        // Bind Undo Button
         document.getElementById('btn-undo').addEventListener('click', (e) => {
             e.stopPropagation();
             
@@ -1564,7 +1543,6 @@
             }
         });
 
-        // Bind Redo Button
         document.getElementById('btn-redo').addEventListener('click', (e) => {
             e.stopPropagation();
             
@@ -1669,9 +1647,6 @@
             phraseCard = null;
         }
 
-        // ==========================================
-        // OPTIMIZED UNDO TIMER (Reduced to 400ms)
-        // ==========================================
         panel.addEventListener('input', () => {
             clearTimeout(typingTimer);
             typingTimer = setTimeout(() => { 
@@ -1692,9 +1667,6 @@
             }
         });
 
-        // ==========================================
-        // PERSISTENT PWA INSTALL PROMPT
-        // ==========================================
         let deferredPrompt;
         const installBanner = document.getElementById('lexo-install-banner');
         const closeInstallBtn = document.getElementById('close-install');
@@ -1702,7 +1674,7 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault(); 
             deferredPrompt = e;
-            installBanner.style.display = 'block'; // Show persistent banner
+            installBanner.style.display = 'block'; 
         });
 
         installBanner.addEventListener('click', async (e) => {

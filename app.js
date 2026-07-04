@@ -1,4 +1,4 @@
-const APP_VERSION = "v3.30"
+const APP_VERSION = "v3.33"
 const allParas = document.querySelectorAll('.lexo-paragraph');
 const notification = document.getElementById('notification');
 const phraseBtn = document.getElementById('phrase-move-btn');
